@@ -181,15 +181,107 @@ function Hero() {
   );
 }
 
+/* ──────────────────────── PHOTO CAROUSEL ──────────────────────── */
+const photos = [
+  { src: "/photos/dojo-throw.jpg", caption: "Takayasu Sensei demonstrating at the Iwama dojo" },
+  { src: "/photos/three-masters.jpg", caption: "With Saito Sensei in Australia, early years" },
+  { src: "/photos/saito-takayasu.jpg", caption: "Saito Sensei and Takayasu Sensei" },
+  { src: "/photos/bokken-practice.jpg", caption: "Weapons demonstration" },
+  { src: "/photos/weapons-demo.jpg", caption: "Jo technique at a seminar" },
+  { src: "/photos/jo-technique.jpg", caption: "Ken suburi demonstration" },
+];
+
+function PhotoCarousel() {
+  const [current, setCurrent] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    if (isHovered) return;
+    timerRef.current = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % photos.length);
+    }, 5000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [isHovered]);
+
+  const go = (dir: -1 | 1) => setCurrent((prev) => (prev + dir + photos.length) % photos.length);
+
+  return (
+    <div
+      className="relative w-full overflow-hidden bg-slate-100"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Main image area */}
+      <div className="relative aspect-[4/3] md:aspect-[3/2]">
+        {photos.map((photo, i) => (
+          <div
+            key={photo.src}
+            className="absolute inset-0 transition-opacity duration-700 ease-in-out"
+            style={{ opacity: i === current ? 1 : 0 }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo.src}
+              alt={photo.caption}
+              className="w-full h-full object-cover"
+              loading={i === 0 ? "eager" : "lazy"}
+            />
+          </div>
+        ))}
+
+        {/* Gradient overlay at bottom for caption */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/50 to-transparent" />
+
+        {/* Caption */}
+        <div className="absolute bottom-4 left-5 right-16">
+          <p className="font-sans text-sm text-white/90 drop-shadow-md transition-opacity duration-500">
+            {photos[current].caption}
+          </p>
+        </div>
+
+        {/* Nav arrows */}
+        <button
+          onClick={() => go(-1)}
+          className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-slate-600 hover:bg-white hover:text-crimson transition-all duration-200 shadow-sm"
+          aria-label="Previous photo"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button
+          onClick={() => go(1)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm text-slate-600 hover:bg-white hover:text-crimson transition-all duration-200 shadow-sm"
+          aria-label="Next photo"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Dot indicators */}
+      <div className="flex justify-center gap-2 py-3 bg-white">
+        {photos.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              i === current ? "bg-crimson w-6" : "bg-slate-300 hover:bg-slate-400"
+            }`}
+            aria-label={`Go to photo ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ──────────────────────── ABOUT ──────────────────────── */
 function About() {
   return (
     <section id="about" className="relative py-24 md:py-32 overflow-hidden">
-      {/* Side kanji accent */}
-      <div className="absolute right-4 md:right-12 top-20 kanji-accent text-[8rem] md:text-[12rem] leading-none font-bold" style={{ fontFamily: "var(--font-jp)" }}>
-        武<br />産
-      </div>
-
       <div className="max-w-6xl mx-auto px-6">
         <Reveal>
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-crimson font-semibold mb-4">
@@ -199,54 +291,39 @@ function About() {
 
         <Reveal delay={100}>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-ink mb-12 max-w-2xl">
-            A once-in-a-lifetime opportunity to experience authentic Iwama-style Aikido
+            50 Years of Authentic Iwama-style Aikido in Australia
           </h2>
         </Reveal>
 
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16">
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-start">
+          {/* Text — shorter, punchier */}
           <div className="space-y-6">
             <Reveal delay={200}>
               <p className="font-sans text-base leading-relaxed text-ink-light">
-                The Takemusu Aiki Association invites you to a landmark seminar commemorating
-                Saburo Takayasu Shihan&apos;s 50 years of teaching Aikido in Australia. This rare
-                opportunity will feature a comprehensive recapitulation of Takayasu Sensei&apos;s life&apos;s
-                work — preserving and transmitting the authentic teachings of O-Sensei Morihei
-                Ueshiba&apos;s Takemusu Aiki as practised at the Iwama dojo.
+                Takayasu Sensei, 7th Dan, is one of the few remaining instructors with direct
+                experience of O-Sensei&apos;s teaching — present at O-Sensei&apos;s last class in Iwama
+                and a long-term student of the late Morihiro Saito Sensei.
               </p>
             </Reveal>
             <Reveal delay={300}>
               <p className="font-sans text-base leading-relaxed text-ink-light">
-                Takayasu Sensei, 7th Dan, Chief Instructor and President of the Takemusu Aiki
-                Association, is one of the few remaining instructors with direct experience of
-                O-Sensei&apos;s teaching. He was present at O-Sensei&apos;s last class in Iwama and
-                subsequently trained under the late Morihiro Saito Sensei.
+                This landmark seminar covers the full spectrum of Takemusu Aiki: fundamental
+                principles, throwing techniques, weapons work and practical applications — a
+                culmination of five decades of teaching experience.
+              </p>
+            </Reveal>
+            <Reveal delay={400}>
+              <p className="font-sans text-base leading-relaxed text-ink-light">
+                All aikido-ka are warmly welcome, whether long-term students or visitors from
+                other traditions. Numbers are limited to 100.
               </p>
             </Reveal>
           </div>
 
-          <div className="space-y-6">
-            <Reveal delay={250}>
-              <p className="font-sans text-base leading-relaxed text-ink-light">
-                Over five decades in Australia, Takayasu Sensei has distinguished himself as an
-                instructor who can not only demonstrate but clearly explain the principles
-                underlying O-Sensei&apos;s Aikido.
-              </p>
-            </Reveal>
-            <Reveal delay={350}>
-              <p className="font-sans text-base leading-relaxed text-ink-light">
-                This seminar represents a culmination of 50 years of teaching experience and will
-                cover the full spectrum of Takemusu Aiki: from fundamental principles and
-                throwing techniques to weapons work and practical applications.
-              </p>
-            </Reveal>
-            <Reveal delay={450}>
-              <p className="font-sans text-base leading-relaxed text-ink-light">
-                Whether you are a long-term student of Takayasu Sensei or visiting from another
-                tradition, this seminar offers an invaluable opportunity to experience and preserve
-                the essence of authentic Iwama-style Aikido. All aikido-ka are warmly welcome.
-              </p>
-            </Reveal>
-          </div>
+          {/* Photo carousel */}
+          <Reveal delay={250}>
+            <PhotoCarousel />
+          </Reveal>
         </div>
       </div>
     </section>
@@ -262,7 +339,7 @@ const day1 = [
   { time: "12:15 – 13:30", title: "Lunch", desc: "" },
   { time: "13:30 – 15:00", title: "Variety of Throwing Techniques", desc: "Shiho-nage, Kote-gaeshi, Irimi-nage, Kokyu-nage, Koshi-nage, Tenchi-nage, Juji-garami" },
   { time: "15:00 – 15:15", title: "Break", desc: "" },
-  { time: "15:15 – 16:15", title: "Ushiro-waza & Practical Application", desc: "Variety of Ushiro-waza & practical application of Aikido (Henka waza)" },
+  { time: "15:15 – 16:15", title: "Ushiro-waza & Practical Application", desc: "Variety of Ushiro-waza & practical application of Aikido (Ooyo waza)" },
   { time: "18:30", title: "50th Anniversary Dinner", desc: "Dinner at a local restaurant" },
 ];
 
