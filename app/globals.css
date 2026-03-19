@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-crimson: #B91C1C;
+  --color-crimson-dark: #991B1B;
+  --color-crimson-light: #DC2626;
+  --color-ink: #334155;
+  --color-ink-light: #64748B;
+  --color-parchment: #FFFFFF;
+  --color-parchment-dark: #F8FAFC;
+  --color-warm-gray: #94A3B8;
+
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
+  --font-sans: "Outfit", "Helvetica Neue", sans-serif;
+  --font-display: "Cormorant Garamond", serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-parchment);
+    color: var(--color-ink);
+  }
+
+  ::selection {
+    background-color: var(--color-crimson);
+    color: white;
+  }
+}
+
+/* Kanji watermark styling */
+.kanji-watermark {
+  font-family: "Noto Serif JP", serif;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  color: rgba(185, 28, 28, 0.06);
+  font-size: clamp(6rem, 15vw, 14rem);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  user-select: none;
+  pointer-events: none;
+}
+
+.kanji-accent {
+  font-family: "Noto Serif JP", serif;
+  color: rgba(185, 28, 28, 0.08);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Ink brush stroke divider */
+.ink-divider {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-crimson) 15%,
+    var(--color-crimson) 85%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
+/* Schedule table styling */
+.schedule-row {
+  border-bottom: 1px solid rgba(26, 26, 26, 0.08);
+  transition: background-color 0.2s ease;
+}
+.schedule-row:hover {
+  background-color: rgba(185, 28, 28, 0.03);
+}
+
+/* Registration form focus states */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-crimson) !important;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+/* Noise texture overlay */
+.noise-overlay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-delay-100 { animation-delay: 0.1s; }
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-300 { animation-delay: 0.3s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-500 { animation-delay: 0.5s; }
+.animation-delay-600 { animation-delay: 0.6s; }
