@@ -185,7 +185,7 @@ function Hero() {
 const photos = [
   { src: "/photos/dojo-throw.jpg", caption: "Takayasu Sensei demonstrating at the Iwama dojo" },
   { src: "/photos/three-masters.jpg", caption: "With Saito Sensei in Australia, early years" },
-  { src: "/photos/saito-takayasu.jpg", caption: "Saito Sensei and Takayasu Sensei" },
+  { src: "/photos/saito-takayasu.jpg", caption: "Takayasu Sensei at Mary Street dojo" },
   { src: "/photos/bokken-practice.jpg", caption: "Weapons demonstration" },
   { src: "/photos/weapons-demo.jpg", caption: "Handling a live blade" },
   { src: "/photos/jo-technique.jpg", caption: "Ken suburi demonstration" },
