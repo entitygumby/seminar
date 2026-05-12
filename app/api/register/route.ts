@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const count = await getRegistrationCount();
     if (count >= 50) {
       return NextResponse.json(
-        { error: "Sorry, the seminar is at full capacity. Please contact seminar@aikidoaus.com.au for waitlist options." },
+        { error: "Sorry, the seminar is at full capacity. Please contact aikido@aikidoaus.com.au for waitlist options." },
         { status: 409 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Registration error:", error);
     return NextResponse.json(
-      { error: "Registration failed. Please try again or contact seminar@aikidoaus.com.au." },
+      { error: "Registration failed. Please try again or contact aikido@aikidoaus.com.au." },
       { status: 500 }
     );
   }

@@ -593,8 +593,8 @@ function RegistrationForm() {
           </p>
           <p className="font-sans text-sm text-warm-gray">
             If you have any questions, please contact{" "}
-            <a href="mailto:seminar@aikidoaus.com.au" className="text-crimson hover:underline">
-              seminar@aikidoaus.com.au
+            <a href="mailto:aikido@aikidoaus.com.au" className="text-crimson hover:underline">
+              aikido@aikidoaus.com.au
             </a>
           </p>
           <button
@@ -838,10 +838,10 @@ function Footer() {
               Contact
             </p>
             <a
-              href="mailto:seminar@aikidoaus.com.au"
+              href="mailto:aikido@aikidoaus.com.au"
               className="font-sans text-sm text-ink-light hover:text-crimson transition-colors block mb-2"
             >
-              seminar@aikidoaus.com.au
+              aikido@aikidoaus.com.au
             </a>
             <a
               href="https://www.aikidoaus.com.au"
