@@ -232,6 +232,8 @@ export default function AdminPage() {
                       <span className={`inline-block font-sans text-xs font-semibold tracking-wider uppercase px-2 py-1 ${
                         reg.registration_type === "both"
                           ? "bg-crimson/10 text-crimson"
+                          : reg.registration_type === "dinner_only"
+                          ? "bg-amber-50 text-amber-700"
                           : "bg-crimson/5 text-crimson-dark"
                       }`}>
                         {reg.registration_type === "both"
@@ -240,6 +242,8 @@ export default function AdminPage() {
                           ? "Sat Only"
                           : reg.registration_type === "sunday"
                           ? "Sun Only"
+                          : reg.registration_type === "dinner_only"
+                          ? "Dinner Only"
                           : reg.registration_type}
                       </span>
                     </td>

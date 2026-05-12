@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const validTypes = ["saturday", "sunday", "both"];
+    const validTypes = ["saturday", "sunday", "both", "dinner_only"];
     const regType = validTypes.includes(registrationType) ? registrationType : "both";
 
     const registration = await addRegistration({

@@ -542,7 +542,7 @@ function RegistrationForm() {
     phone: "",
     dojo: "",
     rank: "",
-    registrationType: "both" as "saturday" | "sunday" | "both",
+    registrationType: "both" as "saturday" | "sunday" | "both" | "dinner_only",
     attendDinner: false,
     dietaryRequirements: "",
   });
@@ -567,7 +567,7 @@ function RegistrationForm() {
       }
 
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", dojo: "", rank: "", registrationType: "both", attendDinner: false, dietaryRequirements: "" });
+      setForm({ name: "", email: "", phone: "", dojo: "", rank: "", registrationType: "both" as "saturday" | "sunday" | "both" | "dinner_only", attendDinner: false, dietaryRequirements: "" });
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
@@ -637,7 +637,7 @@ function RegistrationForm() {
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
-                  <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">TBC</span> (optional)</p>
+                  <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">TBC</span> (optional add-on or dinner only)</p>
                 </div>
               </div>
             </Reveal>
@@ -722,11 +722,18 @@ function RegistrationForm() {
                     { value: "both", label: "Both Days", price: "$150" },
                     { value: "saturday", label: "Saturday Only", price: "$80" },
                     { value: "sunday", label: "Sunday Only", price: "$80" },
+                    { value: "dinner_only", label: "Dinner Only", price: "TBC" },
                   ] as const).map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => update("registrationType", opt.value)}
+                      onClick={() => {
+                        setForm((prev) => ({
+                          ...prev,
+                          registrationType: opt.value,
+                          ...(opt.value === "dinner_only" ? { attendDinner: true } : {}),
+                        }));
+                      }}
                       className={`text-left px-4 py-3 border-2 transition-all duration-200 ${
                         form.registrationType === opt.value
                           ? "border-crimson bg-crimson/5"
@@ -748,11 +755,12 @@ function RegistrationForm() {
                 <input
                   type="checkbox"
                   id="dinner"
-                  checked={form.attendDinner}
+                  checked={form.attendDinner || form.registrationType === "dinner_only"}
+                  disabled={form.registrationType === "dinner_only"}
                   onChange={(e) => update("attendDinner", e.target.checked)}
-                  className="w-4 h-4 accent-crimson"
+                  className="w-4 h-4 accent-crimson disabled:opacity-50"
                 />
-                <label htmlFor="dinner" className="font-sans text-sm text-ink-light cursor-pointer">
+                <label htmlFor="dinner" className={`font-sans text-sm cursor-pointer ${form.registrationType === "dinner_only" ? "text-ink-light/50" : "text-ink-light"}`}>
                   Add Anniversary Dinner — Saturday evening (price TBC)
                 </label>
               </div>
