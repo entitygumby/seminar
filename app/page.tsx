@@ -439,7 +439,7 @@ function Pricing() {
           </h2>
         </Reveal>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           <Reveal delay={200}>
             <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Full Seminar</p>
@@ -449,6 +449,14 @@ function Pricing() {
           </Reveal>
 
           <Reveal delay={300}>
+            <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
+              <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">One Day Training</p>
+              <p className="font-serif text-5xl font-bold text-crimson mb-2">$80</p>
+              <p className="font-sans text-sm text-ink-light">Single day training access (Saturday or Sunday)</p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={400}>
             <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Anniversary Dinner</p>
               <p className="font-serif text-5xl font-bold text-crimson mb-2">TBC</p>
