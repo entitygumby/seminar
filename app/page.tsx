@@ -641,6 +641,29 @@ function RegistrationForm() {
                 </div>
               </div>
             </Reveal>
+            <Reveal delay={400}>
+              <div className="mt-8 border-l-4 border-crimson pl-5">
+                <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-3">How to Pay</p>
+                <div className="space-y-1.5">
+                  <div className="flex gap-3">
+                    <span className="font-sans text-xs text-warm-gray w-24 shrink-0">Account name</span>
+                    <span className="font-sans text-sm font-medium text-ink">Takemusu Aiki Association</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-sans text-xs text-warm-gray w-24 shrink-0">BSB</span>
+                    <span className="font-sans text-sm font-medium text-ink">112-879</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-sans text-xs text-warm-gray w-24 shrink-0">Account</span>
+                    <span className="font-sans text-sm font-medium text-ink">043281148</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="font-sans text-xs text-warm-gray w-24 shrink-0">Reference</span>
+                    <span className="font-sans text-sm text-ink-light">Your name</span>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
           </div>
 
           <Reveal delay={200}>
