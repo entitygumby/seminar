@@ -167,7 +167,7 @@ function Hero() {
           </div>
 
           <p className="animate-fade-up animation-delay-500 mt-8 font-sans text-sm text-crimson font-semibold">
-            Limited to 100 attendees — register early to secure your place.
+            Limited to 50 attendees — register early to secure your place.
           </p>
         </div>
       </div>
@@ -315,7 +315,7 @@ function About() {
             <Reveal delay={400}>
               <p className="font-sans text-base leading-relaxed text-ink-light">
                 All aikido-ka are warmly welcome, whether long-term students or visitors from
-                other traditions. Numbers are limited to 100.
+                other traditions. Numbers are limited to 50.
               </p>
             </Reveal>
           </div>
@@ -439,7 +439,7 @@ function Pricing() {
           </h2>
         </Reveal>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           <Reveal delay={200}>
             <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Full Seminar</p>
@@ -451,16 +451,8 @@ function Pricing() {
           <Reveal delay={300}>
             <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Anniversary Dinner</p>
-              <p className="font-serif text-5xl font-bold text-crimson mb-2">$40</p>
+              <p className="font-serif text-5xl font-bold text-crimson mb-2">TBC</p>
               <p className="font-sans text-sm text-ink-light">Saturday dinner party with Takayasu Sensei at a local restaurant (optional)</p>
-            </div>
-          </Reveal>
-
-          <Reveal delay={400}>
-            <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
-              <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Observer Pass</p>
-              <p className="font-serif text-5xl font-bold text-crimson mb-2">$20</p>
-              <p className="font-sans text-sm text-ink-light">Per day. No fee for Aikido and AJF instructors with prior approval</p>
             </div>
           </Reveal>
         </div>
@@ -542,7 +534,7 @@ function RegistrationForm() {
     phone: "",
     dojo: "",
     rank: "",
-    registrationType: "both" as "saturday" | "sunday" | "both" | "observer",
+    registrationType: "both" as "saturday" | "sunday" | "both",
     attendDinner: false,
     dietaryRequirements: "",
   });
@@ -625,7 +617,7 @@ function RegistrationForm() {
             </Reveal>
             <Reveal delay={200}>
               <p className="font-sans text-base text-ink-light mb-8 leading-relaxed">
-                Numbers are limited to 100 attendees. Register your interest below and
+                Numbers are limited to 50 attendees. Register your interest below and
                 we will confirm your place and provide payment details.
               </p>
             </Reveal>
@@ -637,11 +629,7 @@ function RegistrationForm() {
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
-                  <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">$40</span> (optional)</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
-                  <p className="font-sans text-sm text-ink-light">Observer pass: <span className="text-ink font-semibold">$20</span> per day</p>
+                  <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">TBC</span> (optional)</p>
                 </div>
               </div>
             </Reveal>
@@ -724,9 +712,8 @@ function RegistrationForm() {
                 <div className="grid grid-cols-2 gap-3">
                   {([
                     { value: "both", label: "Both Days", price: "$150" },
-                    { value: "saturday", label: "Saturday Only", price: "$90" },
-                    { value: "sunday", label: "Sunday Only", price: "$90" },
-                    { value: "observer", label: "Observer", price: "$20/day" },
+                    { value: "saturday", label: "Saturday Only", price: "$80" },
+                    { value: "sunday", label: "Sunday Only", price: "$80" },
                   ] as const).map((opt) => (
                     <button
                       key={opt.value}
@@ -758,7 +745,7 @@ function RegistrationForm() {
                   className="w-4 h-4 accent-crimson"
                 />
                 <label htmlFor="dinner" className="font-sans text-sm text-ink-light cursor-pointer">
-                  Add Anniversary Dinner — Saturday evening (+$40)
+                  Add Anniversary Dinner — Saturday evening (price TBC)
                 </label>
               </div>
 

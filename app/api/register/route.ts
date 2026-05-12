@@ -25,14 +25,14 @@ export async function POST(request: NextRequest) {
 
     // Check capacity
     const count = await getRegistrationCount();
-    if (count >= 100) {
+    if (count >= 50) {
       return NextResponse.json(
         { error: "Sorry, the seminar is at full capacity. Please contact seminar@aikidoaus.com.au for waitlist options." },
         { status: 409 }
       );
     }
 
-    const validTypes = ["saturday", "sunday", "both", "observer"];
+    const validTypes = ["saturday", "sunday", "both"];
     const regType = validTypes.includes(registrationType) ? registrationType : "both";
 
     const registration = await addRegistration({
