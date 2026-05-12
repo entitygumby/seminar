@@ -187,7 +187,7 @@ const photos = [
   { src: "/photos/three-masters.jpg", caption: "With Saito Sensei in Australia, early years" },
   { src: "/photos/saito-takayasu.jpg", caption: "Saito Sensei and Takayasu Sensei" },
   { src: "/photos/bokken-practice.jpg", caption: "Weapons demonstration" },
-  { src: "/photos/weapons-demo.jpg", caption: "Jo technique at a seminar" },
+  { src: "/photos/weapons-demo.jpg", caption: "Handling a live blade" },
   { src: "/photos/jo-technique.jpg", caption: "Ken suburi demonstration" },
 ];
 
