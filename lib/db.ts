@@ -8,6 +8,7 @@ export interface Registration {
   registration_type: string;
   attend_dinner: boolean;
   dietary_requirements: string;
+  paid?: boolean;
   created_at?: string;
 }
 
@@ -41,9 +42,11 @@ export async function initDB() {
         registration_type TEXT DEFAULT 'both',
         attend_dinner BOOLEAN DEFAULT FALSE,
         dietary_requirements TEXT DEFAULT '',
+        paid BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `;
+    await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS paid BOOLEAN DEFAULT FALSE`;
   } catch (error) {
     console.error("Failed to init Postgres, falling back to memory store:", error);
   }
@@ -101,6 +104,42 @@ export async function getRegistrations(): Promise<Registration[]> {
   } catch (error) {
     console.error("Postgres query failed, returning memory store:", error);
     return [...memoryStore].reverse();
+  }
+}
+
+export async function deleteRegistration(id: number): Promise<boolean> {
+  if (!hasPostgres()) {
+    const idx = memoryStore.findIndex((r) => r.id === id);
+    if (idx === -1) return false;
+    memoryStore.splice(idx, 1);
+    return true;
+  }
+  try {
+    await initDB();
+    const sql = await getSQL();
+    await sql`DELETE FROM registrations WHERE id = ${id}`;
+    return true;
+  } catch (error) {
+    console.error("Postgres delete failed:", error);
+    return false;
+  }
+}
+
+export async function updatePaidStatus(id: number, paid: boolean): Promise<Registration | null> {
+  if (!hasPostgres()) {
+    const entry = memoryStore.find((r) => r.id === id);
+    if (!entry) return null;
+    entry.paid = paid;
+    return entry;
+  }
+  try {
+    await initDB();
+    const sql = await getSQL();
+    const result = await sql`UPDATE registrations SET paid = ${paid} WHERE id = ${id} RETURNING *`;
+    return (result.rows[0] as Registration) ?? null;
+  } catch (error) {
+    console.error("Postgres update paid failed:", error);
+    return null;
   }
 }
 
