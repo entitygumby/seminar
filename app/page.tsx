@@ -562,6 +562,8 @@ function RegistrationForm() {
     rank: "",
     registrationType: "both" as "saturday" | "sunday" | "both" | "dinner_only",
     attendDinner: false,
+    lunchSaturday: false,
+    lunchSunday: false,
     dietaryRequirements: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -585,7 +587,7 @@ function RegistrationForm() {
       }
 
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", dojo: "", rank: "", registrationType: "both" as "saturday" | "sunday" | "both" | "dinner_only", attendDinner: false, dietaryRequirements: "" });
+      setForm({ name: "", email: "", phone: "", dojo: "", rank: "", registrationType: "both" as "saturday" | "sunday" | "both" | "dinner_only", attendDinner: false, lunchSaturday: false, lunchSunday: false, dietaryRequirements: "" });
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
@@ -656,6 +658,10 @@ function RegistrationForm() {
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
                   <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">TBC</span> (optional add-on or dinner only)</p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
+                  <p className="font-sans text-sm text-ink-light">Lunch (Sat or Sun): <span className="text-ink font-semibold">$20 each</span> (optional add-on)</p>
                 </div>
               </div>
             </Reveal>
@@ -750,6 +756,8 @@ function RegistrationForm() {
                           ...prev,
                           registrationType: opt.value,
                           ...(opt.value === "dinner_only" ? { attendDinner: true } : {}),
+                          lunchSaturday: opt.value === "sunday" || opt.value === "dinner_only" ? false : prev.lunchSaturday,
+                          lunchSunday: opt.value === "saturday" || opt.value === "dinner_only" ? false : prev.lunchSunday,
                         }));
                       }}
                       className={`text-left px-4 py-3 border-2 transition-all duration-200 ${
@@ -782,6 +790,36 @@ function RegistrationForm() {
                   Add Anniversary Dinner — Saturday evening (price TBC)
                 </label>
               </div>
+
+              {(form.registrationType === "both" || form.registrationType === "saturday") && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="lunchSat"
+                    checked={form.lunchSaturday}
+                    onChange={(e) => update("lunchSaturday", e.target.checked)}
+                    className="w-4 h-4 accent-crimson"
+                  />
+                  <label htmlFor="lunchSat" className="font-sans text-sm cursor-pointer text-ink-light">
+                    Add Saturday Lunch — <span className="text-ink font-semibold">$20</span>
+                  </label>
+                </div>
+              )}
+
+              {(form.registrationType === "both" || form.registrationType === "sunday") && (
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="lunchSun"
+                    checked={form.lunchSunday}
+                    onChange={(e) => update("lunchSunday", e.target.checked)}
+                    className="w-4 h-4 accent-crimson"
+                  />
+                  <label htmlFor="lunchSun" className="font-sans text-sm cursor-pointer text-ink-light">
+                    Add Sunday Lunch — <span className="text-ink font-semibold">$20</span>
+                  </label>
+                </div>
+              )}
 
               <div>
                 <label className="block font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-2">

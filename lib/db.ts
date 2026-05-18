@@ -7,6 +7,8 @@ export interface Registration {
   rank: string;
   registration_type: string;
   attend_dinner: boolean;
+  lunch_saturday: boolean;
+  lunch_sunday: boolean;
   dietary_requirements: string;
   paid?: boolean;
   created_at?: string;
@@ -41,12 +43,16 @@ export async function initDB() {
         rank TEXT DEFAULT '',
         registration_type TEXT DEFAULT 'both',
         attend_dinner BOOLEAN DEFAULT FALSE,
+        lunch_saturday BOOLEAN DEFAULT FALSE,
+        lunch_sunday BOOLEAN DEFAULT FALSE,
         dietary_requirements TEXT DEFAULT '',
         paid BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT NOW()
       )
     `;
     await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS paid BOOLEAN DEFAULT FALSE`;
+    await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS lunch_saturday BOOLEAN DEFAULT FALSE`;
+    await sql`ALTER TABLE registrations ADD COLUMN IF NOT EXISTS lunch_sunday BOOLEAN DEFAULT FALSE`;
   } catch (error) {
     console.error("Failed to init Postgres, falling back to memory store:", error);
   }
@@ -68,8 +74,8 @@ export async function addRegistration(reg: Omit<Registration, "id" | "created_at
     const sql = await getSQL();
 
     const result = await sql`
-      INSERT INTO registrations (name, email, phone, dojo, rank, registration_type, attend_dinner, dietary_requirements)
-      VALUES (${reg.name}, ${reg.email}, ${reg.phone}, ${reg.dojo}, ${reg.rank}, ${reg.registration_type}, ${reg.attend_dinner}, ${reg.dietary_requirements})
+      INSERT INTO registrations (name, email, phone, dojo, rank, registration_type, attend_dinner, lunch_saturday, lunch_sunday, dietary_requirements)
+      VALUES (${reg.name}, ${reg.email}, ${reg.phone}, ${reg.dojo}, ${reg.rank}, ${reg.registration_type}, ${reg.attend_dinner}, ${reg.lunch_saturday}, ${reg.lunch_sunday}, ${reg.dietary_requirements})
       RETURNING *
     `;
 

@@ -11,6 +11,8 @@ interface Registration {
   rank: string;
   registration_type: string;
   attend_dinner: boolean;
+  lunch_saturday: boolean;
+  lunch_sunday: boolean;
   dietary_requirements: string;
   paid: boolean;
   created_at: string;
@@ -106,6 +108,8 @@ export default function AdminPage() {
   const bothDaysCount = registrations.filter((r) => r.registration_type === "both").length;
   const satOnlyCount = registrations.filter((r) => r.registration_type === "saturday").length;
   const sunOnlyCount = registrations.filter((r) => r.registration_type === "sunday").length;
+  const lunchSatCount = registrations.filter((r) => r.lunch_saturday).length;
+  const lunchSunCount = registrations.filter((r) => r.lunch_sunday).length;
 
   if (!authenticated) {
     return (
@@ -162,7 +166,7 @@ export default function AdminPage() {
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-7 gap-4 mb-8">
           <div className="bg-white border border-ink/10 p-5">
             <p className="font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1">Total</p>
             <p className="font-serif text-3xl font-bold text-crimson">{registrations.length}</p>
@@ -182,6 +186,16 @@ export default function AdminPage() {
             <p className="font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1">Dinner</p>
             <p className="font-serif text-3xl font-bold text-ink">{dinnerCount}</p>
             <p className="font-sans text-xs text-ink-light">attending dinner</p>
+          </div>
+          <div className="bg-white border border-ink/10 p-5">
+            <p className="font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1">Sat Lunch</p>
+            <p className="font-serif text-3xl font-bold text-ink">{lunchSatCount}</p>
+            <p className="font-sans text-xs text-ink-light">Saturday lunch</p>
+          </div>
+          <div className="bg-white border border-ink/10 p-5">
+            <p className="font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1">Sun Lunch</p>
+            <p className="font-serif text-3xl font-bold text-ink">{lunchSunCount}</p>
+            <p className="font-sans text-xs text-ink-light">Sunday lunch</p>
           </div>
           <div className="bg-white border border-ink/10 p-5">
             <p className="font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1">Paid</p>
@@ -208,6 +222,8 @@ export default function AdminPage() {
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Rank</th>
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Type</th>
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Dinner</th>
+                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Sat Lunch</th>
+                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Sun Lunch</th>
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Diet</th>
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Date</th>
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Paid</th>
@@ -249,6 +265,12 @@ export default function AdminPage() {
                     </td>
                     <td className="px-4 py-3 font-sans text-sm text-ink-light">
                       {reg.attend_dinner ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-3 font-sans text-sm text-ink-light">
+                      {reg.lunch_saturday ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-3 font-sans text-sm text-ink-light">
+                      {reg.lunch_sunday ? "Yes" : "No"}
                     </td>
                     <td className="px-4 py-3 font-sans text-sm text-ink-light">{reg.dietary_requirements || "—"}</td>
                     <td className="px-4 py-3 font-sans text-xs text-warm-gray whitespace-nowrap">
