@@ -145,6 +145,7 @@ export default function MemoriesAdmin() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
   const [memories, setMemories] = useState<Memory[]>([]);
+  const [storage, setStorage] = useState<{ database: string; photos: string; environment: string; durable: boolean } | null>(null);
   const [tab, setTab] = useState<MemoryStatus>("pending");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<number | null>(null);
@@ -156,7 +157,9 @@ export default function MemoriesAdmin() {
       setError(res.status === 401 ? "Invalid password" : "Failed to load contributions");
       return;
     }
-    setMemories((await res.json()).memories);
+    const data = await res.json();
+    setMemories(data.memories);
+    setStorage(data.storage);
     setToken(pw);
   }, []);
 
@@ -226,6 +229,18 @@ export default function MemoriesAdmin() {
             <a href="/admin" className="font-sans text-xs font-semibold tracking-widest uppercase px-4 py-2 border border-slate-300 text-ink-light hover:text-crimson">
               Registrations
             </a>
+            <button
+              onClick={() => {
+                const blob = new Blob([JSON.stringify({ exported_at: new Date().toISOString(), memories }, null, 2)], { type: "application/json" });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `memories-backup-${new Date().toISOString().slice(0, 10)}.json`;
+                a.click();
+              }}
+              className="font-sans text-xs font-semibold tracking-widest uppercase px-4 py-2 border border-slate-300 text-ink-light hover:text-crimson"
+            >
+              Download backup
+            </button>
             <a href="/memories" target="_blank" className="font-sans text-xs font-semibold tracking-widest uppercase px-4 py-2 border border-slate-300 text-ink-light hover:text-crimson">
               View album
             </a>
@@ -234,6 +249,21 @@ export default function MemoriesAdmin() {
             </a>
           </div>
         </div>
+
+        {storage && (
+          <div
+            className={`mb-6 border px-4 py-3 font-sans text-sm ${
+              storage.durable ? "border-green-700/30 bg-green-50 text-green-900" : "border-crimson/40 bg-red-50 text-crimson"
+            }`}
+          >
+            <strong>{storage.durable ? "Storage connected" : "Storage NOT connected — contributions are not being saved permanently"}</strong>
+            <span className="block mt-1 text-xs">
+              Environment: {storage.environment} &middot; Contributions:{" "}
+              {storage.database === "postgres" ? "Postgres database ✓" : "temporary memory ✗ (connect a Postgres database)"} &middot; Photos:{" "}
+              {storage.photos === "blob" ? "Vercel Blob ✓" : "not stored ✗ (connect a Blob store)"}
+            </span>
+          </div>
+        )}
 
         <div className="flex gap-2 mb-6 border-b border-slate-200">
           {TABS.map((t) => (

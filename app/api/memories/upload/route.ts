@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
+import { storageStatus } from "@/lib/memories";
 
 const MAX_BYTES = 4 * 1024 * 1024; // photos are resized in the browser before upload
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
 
 export async function POST(request: NextRequest) {
+  if (!storageStatus().acceptingUploads) {
+    console.error("Photo upload refused: Postgres or Blob storage is not configured for this deployment");
+    return NextResponse.json(
+      { error: "Uploads are temporarily unavailable. Please try again later or email aikido@aikidoaus.com.au." },
+      { status: 503 }
+    );
+  }
   const form = await request.formData();
   const file = form.get("file");
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addMemory, ERAS, getMemories, toPublic, type Era, type MemoryPhoto } from "@/lib/memories";
+import { addMemory, ERAS, getMemories, storageStatus, toPublic, type Era, type MemoryPhoto } from "@/lib/memories";
 
 export const dynamic = "force-dynamic";
 
@@ -25,6 +25,13 @@ function isAllowedUrl(url: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  if (!storageStatus().acceptingUploads) {
+    console.error("Contribution refused: Postgres or Blob storage is not configured for this deployment");
+    return NextResponse.json(
+      { error: "Contributions are temporarily unavailable. Please try again later or email aikido@aikidoaus.com.au." },
+      { status: 503 }
+    );
+  }
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 

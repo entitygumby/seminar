@@ -10,6 +10,23 @@ function hasPostgres(): boolean {
   return !!(process.env.POSTGRES_URL || process.env.DATABASE_URL);
 }
 
+/**
+ * Where contributions and photos are being kept. On Vercel, the in-memory and inline
+ * fallbacks would silently lose data, so routes refuse to accept uploads instead.
+ */
+export function storageStatus() {
+  const onVercel = !!process.env.VERCEL;
+  const database = hasPostgres() ? "postgres" : "memory";
+  const photos = process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "inline";
+  return {
+    database,
+    photos,
+    environment: process.env.VERCEL_ENV || "local",
+    durable: database === "postgres" && photos === "blob",
+    acceptingUploads: !onVercel || (database === "postgres" && photos === "blob"),
+  } as const;
+}
+
 async function getSQL() {
   const { sql } = await import("@vercel/postgres");
   return sql;
