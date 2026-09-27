@@ -3,6 +3,8 @@ import { collectPhotos, ERAS, getMemories, toPublic, type PublicMemory } from "@
 import { Seal } from "../Seal";
 import { attributionText } from "../attribution";
 import { PrintToolbar } from "./PrintToolbar";
+import { CoverFront } from "./CoverFront";
+import { LOW_RES_PX, MIXAM, TRIM } from "./specs";
 import "./print.css";
 
 export const dynamic = "force-dynamic";
@@ -74,34 +76,42 @@ function PageNumber({ n }: { n: number }) {
   return <div className="folio">{n}</div>;
 }
 
-export default async function PrintEdition() {
+export default async function PrintEdition({ searchParams }: { searchParams: Promise<{ edition?: string }> }) {
+  // "proof": A4 with cover, for home printing. "mixam": interior pages only, 3mm bleed,
+  // padded to a multiple of 4 — the cover is a separate spread at /memories/print/cover.
+  const mixam = (await searchParams).edition === "mixam";
+  const bleed = mixam ? MIXAM.interiorBleed : 0;
+
   const memories = (await getMemories("approved")).map(toPublic);
   const photos = collectPhotos(memories);
   const photoSheets = paginatePhotos(photos);
   const messageSheets = paginateMessages(memories);
   const contributors = Array.from(new Set(memories.map((m) => m.name))).sort((a, b) => a.localeCompare(b));
 
-  // Cover and dedication are pages 1–2; interior folios continue from 3.
-  let page = 2;
+  const contentPages =
+    (mixam ? 0 : 1) + 1 + photoSheets.length + messageSheets.length + (contributors.length ? 1 : 0) + 1;
+  const blanks = mixam ? (4 - (contentPages % 4)) % 4 : 0;
+  const lowRes = photos.filter((p) => p.width && Math.max(p.width, p.height) < LOW_RES_PX);
+
+  // The dedication is page 1 in the Mixam interior (the cover is printed separately), page 2 in the proof.
+  let page = mixam ? 1 : 2;
 
   return (
-    <div className="print-root">
-      <PrintToolbar pageCount={3 + photoSheets.length + messageSheets.length + (contributors.length ? 1 : 0)} />
+    <div className="print-root" style={{ ["--bleed" as string]: `${bleed}mm` }}>
+      <style>{`@page { size: ${TRIM.width + bleed * 2}mm ${TRIM.height + bleed * 2}mm; margin: 0; }`}</style>
+      <PrintToolbar
+        edition={mixam ? "mixam" : "proof"}
+        pageCount={contentPages + blanks}
+        blanks={blanks}
+        lowRes={lowRes.map((p) => `${p.caption || "Untitled"} (${p.credit}, ${Math.max(p.width, p.height)}px)`)}
+      />
 
-      {/* ── Cover ── */}
-      <section className="sheet cover">
-        <Seal size={110} />
-        <p className="cover-dates">1976 &mdash; 2026</p>
-        <h1 className="cover-title">Fifty Years</h1>
-        <p className="cover-sub">A book of memories for</p>
-        <p className="cover-name">Takayasu Sensei</p>
-        <div className="cover-rule" />
-        <p className="cover-from">
-          With gratitude from the students of the
-          <br />
-          Takemusu Aiki Association
-        </p>
-      </section>
+      {/* ── Cover (proof only) ── */}
+      {!mixam && (
+        <section className="sheet cover">
+          <CoverFront />
+        </section>
+      )}
 
       {/* ── Dedication ── */}
       <section className="sheet dedication">
@@ -200,6 +210,10 @@ export default async function PrintEdition() {
         <p className="back-line">Dōmo arigatō gozaimashita, Sensei.</p>
         <p className="back-small">Takemusu Aiki Association Inc. &middot; 2026</p>
       </section>
+
+      {Array.from({ length: blanks }, (_, i) => (
+        <section key={`blank${i}`} className="sheet blank" aria-label="Blank page" />
+      ))}
     </div>
   );
 }

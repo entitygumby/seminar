@@ -1,15 +1,76 @@
-/* Print edition: fixed A4 sheets, identical on screen and on paper. */
-@page {
-  size: A4 portrait;
-  margin: 0;
+/* Print edition: fixed A4 sheets, identical on screen and on paper.
+   --bleed is 0 for the home proof and 3mm for the Mixam interior; the @page size
+   is set inline by each page to match. */
+
+/* Static (non-variable) fonts for the print pages. Chrome can only embed static fonts
+   in a PDF; variable web fonts come out as Type 3 outlines, which print preflight flags. */
+@font-face {
+  font-family: "Print Serif";
+  src: url("/fonts/print/CormorantGaramond-300.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print Serif";
+  src: url("/fonts/print/CormorantGaramond-400.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print Serif";
+  src: url("/fonts/print/CormorantGaramond-400italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print Serif";
+  src: url("/fonts/print/CormorantGaramond-500.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print Sans";
+  src: url("/fonts/print/Outfit-400.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print Sans";
+  src: url("/fonts/print/Outfit-600.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print JP";
+  src: url("/fonts/print/NotoSerifJP-400-subset.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: "Print JP";
+  src: url("/fonts/print/NotoSerifJP-700-subset.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
 }
 
 .print-root {
+  --font-serif: "Print Serif", serif;
+  --font-sans: "Print Sans", sans-serif;
+  --font-jp: "Print JP";
   --washi: #f6f1e7;
   --paper: #fdfbf7;
   --sumi: #231f1b;
   --sumi-light: #6b6259;
   --shu: #a93226;
+  --bleed: 0mm;
   background: #d9d4cb;
   padding: 88px 0 48px;
   color: var(--sumi);
@@ -19,8 +80,8 @@
 
 .sheet {
   position: relative;
-  width: 210mm;
-  height: 297mm;
+  width: calc(210mm + 2 * var(--bleed));
+  height: calc(297mm + 2 * var(--bleed));
   margin: 0 auto 24px;
   overflow: hidden;
   background: var(--paper);
@@ -36,12 +97,12 @@
 }
 
 .interior {
-  padding: 22mm 20mm 24mm;
+  padding: calc(22mm + var(--bleed)) calc(20mm + var(--bleed)) calc(24mm + var(--bleed));
 }
 
 .folio {
   position: absolute;
-  bottom: 11mm;
+  bottom: calc(11mm + var(--bleed));
   left: 0;
   right: 0;
   text-align: center;
@@ -111,7 +172,7 @@
 .dedication {
   align-items: center;
   justify-content: center;
-  padding: 0 32mm;
+  padding: 0 calc(32mm + var(--bleed));
 }
 .dedication-inner {
   text-align: center;
@@ -287,6 +348,37 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--sumi-light);
+}
+
+/* Cover spread (Mixam): back | hinge | spine | hinge | front, all on washi */
+.cover-spread {
+  display: grid;
+  grid-template-rows: 100%;
+  background: var(--washi);
+}
+.cover-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.cover-back {
+  gap: 8mm;
+}
+.cover-spine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sumi);
+  overflow: hidden;
+}
+.cover-spine span {
+  writing-mode: vertical-rl;
+  font-family: var(--font-serif);
+  font-size: 9.5pt;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
 }
 
 /* Toolbar (screen only) */

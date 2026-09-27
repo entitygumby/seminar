@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { ERAS, type Era, type Memory, type MemoryStatus } from "@/lib/memories-shared";
+import { LOW_RES_PX } from "../../memories/print/specs";
 
 const TABS: { key: MemoryStatus; label: string }[] = [
   { key: "pending", label: "Awaiting review" },
@@ -64,7 +65,7 @@ function MemoryCard({
                   <img src={p.url} alt={p.caption} className="w-full h-40 object-cover bg-slate-100" />
                 </a>
                 <p className="font-sans text-[11px] text-warm-gray">
-                  {p.width}×{p.height}px{Math.max(p.width, p.height) < 1200 && " · low resolution for print"}
+                  {p.width}×{p.height}px{Math.max(p.width, p.height) < LOW_RES_PX && " · may print soft"}
                 </p>
                 <input
                   value={p.caption}
