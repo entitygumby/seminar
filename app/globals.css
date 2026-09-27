@@ -10,6 +10,13 @@
   --color-parchment-dark: #F8FAFC;
   --color-warm-gray: #94A3B8;
 
+  /* Memories album — warm paper, sumi ink, vermilion seal */
+  --color-washi: #F6F1E7;
+  --color-washi-dark: #ECE4D4;
+  --color-sumi: #231F1B;
+  --color-sumi-light: #6B6259;
+  --color-shu: #A93226;
+
   --font-serif: "Cormorant Garamond", "Georgia", serif;
   --font-sans: "Outfit", "Helvetica Neue", sans-serif;
   --font-display: "Cormorant Garamond", serif;
@@ -119,3 +126,24 @@ textarea:focus {
 .animation-delay-400 { animation-delay: 0.4s; }
 .animation-delay-500 { animation-delay: 0.5s; }
 .animation-delay-600 { animation-delay: 0.6s; }
+
+/* ──────────────── Memories album ──────────────── */
+.font-jp {
+  font-family: var(--font-jp), "Noto Serif JP", serif;
+}
+
+.washi-texture {
+  background-color: var(--color-washi);
+  background-image:
+    radial-gradient(rgba(35, 31, 27, 0.035) 1px, transparent 1px),
+    radial-gradient(rgba(35, 31, 27, 0.025) 1px, transparent 1px);
+  background-size: 7px 7px, 11px 11px;
+  background-position: 0 0, 3px 5px;
+}
+
+.brush-rule {
+  height: 3px;
+  width: 72px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-shu) 0%, var(--color-shu) 70%, rgba(169, 50, 38, 0) 100%);
+}

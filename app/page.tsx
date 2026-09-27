@@ -18,6 +18,7 @@ function Nav() {
     { href: "#schedule", label: "Schedule" },
     { href: "#venue", label: "Venue" },
     { href: "#register", label: "Register" },
+    { href: "/memories", label: "Memories" },
   ];
 
   return (
@@ -895,6 +896,7 @@ function Footer() {
               <a href="#schedule" className="block font-sans text-sm text-ink-light hover:text-crimson transition-colors">Schedule</a>
               <a href="#venue" className="block font-sans text-sm text-ink-light hover:text-crimson transition-colors">Venue</a>
               <a href="#register" className="block font-sans text-sm text-ink-light hover:text-crimson transition-colors">Register</a>
+              <a href="/memories" className="block font-sans text-sm text-ink-light hover:text-crimson transition-colors">Book of Memories</a>
             </div>
           </div>
         </div>

@@ -148,6 +148,12 @@ export default function AdminPage() {
             <p className="font-sans text-xs text-ink-light">50th Anniversary Seminar — Takayasu Sensei</p>
           </div>
           <div className="flex gap-3">
+            <a
+              href="/admin/memories"
+              className="font-sans text-xs font-semibold tracking-widest uppercase border border-ink/20 px-4 py-2 hover:border-ink/40 transition-colors"
+            >
+              Memories
+            </a>
             <button
               onClick={handleRefresh}
               className="font-sans text-xs font-semibold tracking-widest uppercase border border-ink/20 px-4 py-2 hover:border-ink/40 transition-colors"

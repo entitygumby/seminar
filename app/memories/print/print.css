@@ -1,0 +1,315 @@
+/* Print edition: fixed A4 sheets, identical on screen and on paper. */
+@page {
+  size: A4 portrait;
+  margin: 0;
+}
+
+.print-root {
+  --washi: #f6f1e7;
+  --paper: #fdfbf7;
+  --sumi: #231f1b;
+  --sumi-light: #6b6259;
+  --shu: #a93226;
+  background: #d9d4cb;
+  padding: 88px 0 48px;
+  color: var(--sumi);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.sheet {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto 24px;
+  overflow: hidden;
+  background: var(--paper);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  break-after: page;
+  page-break-after: always;
+}
+.sheet:last-of-type {
+  break-after: auto;
+  page-break-after: auto;
+}
+
+.interior {
+  padding: 22mm 20mm 24mm;
+}
+
+.folio {
+  position: absolute;
+  bottom: 11mm;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 10pt;
+  color: var(--sumi-light);
+  letter-spacing: 0.1em;
+}
+
+/* Cover */
+.cover {
+  background: var(--washi);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 30mm;
+  border: 8mm solid var(--washi);
+  outline: 0.4mm solid rgba(35, 31, 27, 0.25);
+  outline-offset: -14mm;
+}
+.cover-dates {
+  margin-top: 16mm;
+  font-family: var(--font-sans);
+  font-size: 10pt;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--shu);
+  font-weight: 600;
+}
+.cover-title {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: 64pt;
+  line-height: 1;
+  margin-top: 8mm;
+}
+.cover-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 18pt;
+  color: var(--sumi-light);
+  margin-top: 10mm;
+}
+.cover-name {
+  font-family: var(--font-serif);
+  font-size: 30pt;
+  font-weight: 500;
+  margin-top: 2mm;
+}
+.cover-rule {
+  width: 18mm;
+  height: 0.8mm;
+  background: var(--shu);
+  margin: 14mm auto;
+  border-radius: 1mm;
+}
+.cover-from {
+  font-family: var(--font-sans);
+  font-size: 9.5pt;
+  letter-spacing: 0.12em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: var(--sumi-light);
+}
+
+/* Dedication */
+.dedication {
+  align-items: center;
+  justify-content: center;
+  padding: 0 32mm;
+}
+.dedication-inner {
+  text-align: center;
+}
+.kanji-large {
+  font-family: var(--font-jp), "Noto Serif JP", serif;
+  font-size: 34pt;
+  color: var(--shu);
+  letter-spacing: 0.2em;
+  margin-bottom: 14mm;
+}
+.dedication-text {
+  font-family: var(--font-serif);
+  font-size: 15pt;
+  line-height: 1.65;
+  margin-bottom: 7mm;
+}
+.dedication-sign {
+  margin-top: 14mm;
+  font-family: var(--font-sans);
+  font-size: 8.5pt;
+  letter-spacing: 0.15em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--sumi-light);
+}
+
+/* Chapter & era headings */
+.chapter-title {
+  font-family: var(--font-serif);
+  font-size: 28pt;
+  font-weight: 400;
+  line-height: 1.1;
+  margin-bottom: 4mm;
+}
+.chapter-rule {
+  width: 16mm;
+  height: 0.7mm;
+  background: var(--shu);
+  border-radius: 1mm;
+  margin-bottom: 10mm;
+}
+.era-label {
+  font-family: var(--font-sans);
+  font-size: 8.5pt;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--shu);
+  font-weight: 600;
+  margin-bottom: 6mm;
+}
+
+/* Photographs */
+.photo-grid {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: 9mm;
+}
+.photos-stack .photo-grid {
+  grid-template-rows: 1fr 1fr;
+}
+.photos-pair .photo-grid {
+  grid-template-columns: 1fr 1fr;
+  gap: 7mm;
+}
+.photos-single .photo-grid {
+  grid-template-rows: 1fr;
+}
+.photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  margin: 0;
+}
+.photo-frame img {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+  background: #fff;
+  padding: 2.2mm;
+  box-shadow: 0 0 0 0.25mm rgba(35, 31, 27, 0.12);
+}
+.photos-stack .photo-frame img {
+  max-height: 100mm;
+}
+.photos-pair .photo-frame img {
+  max-height: 175mm;
+}
+.photos-single .photo-frame img {
+  max-height: 190mm;
+}
+.photo figcaption {
+  text-align: center;
+  padding-top: 3.5mm;
+}
+.photo .caption {
+  display: block;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5pt;
+  line-height: 1.35;
+}
+.photo .credit {
+  display: block;
+  margin-top: 1mm;
+  font-family: var(--font-sans);
+  font-size: 7pt;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sumi-light);
+}
+
+/* Messages */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 9mm;
+}
+.message {
+  padding-left: 6mm;
+  border-left: 0.6mm solid rgba(169, 50, 38, 0.45);
+}
+.message-body {
+  font-family: var(--font-serif);
+  font-size: 13pt;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+.message-name {
+  margin-top: 3mm;
+  font-family: var(--font-sans);
+  font-size: 9pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+.message-meta {
+  font-family: var(--font-sans);
+  font-size: 8pt;
+  color: var(--sumi-light);
+  margin-top: 0.5mm;
+}
+
+/* Contributors */
+.contributors {
+  columns: 3;
+  column-gap: 8mm;
+  list-style: none;
+  padding: 0;
+  font-family: var(--font-serif);
+  font-size: 12pt;
+  line-height: 1.9;
+}
+
+/* Back page */
+.back {
+  background: var(--washi);
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8mm;
+}
+.back-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 20pt;
+}
+.back-small {
+  font-family: var(--font-sans);
+  font-size: 8pt;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sumi-light);
+}
+
+/* Toolbar (screen only) */
+.print-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background: var(--sumi);
+  color: var(--washi);
+}
+
+@media print {
+  .print-root {
+    background: none;
+    padding: 0;
+  }
+  .sheet {
+    margin: 0;
+    box-shadow: none;
+  }
+  .print-toolbar {
+    display: none;
+  }
+}
