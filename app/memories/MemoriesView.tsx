@@ -290,7 +290,7 @@ function Footer() {
   return (
     <footer className="bg-sumi text-washi py-20">
       <div className="max-w-6xl mx-auto px-6 text-center">
-        <p className="font-jp text-2xl tracking-[0.3em] text-washi/80">感謝</p>
+        <p className="font-jp text-2xl tracking-[0.12em] text-washi/80">感謝します</p>
         <p className="font-serif italic text-3xl md:text-4xl mt-6">Dōmo arigatō gozaimasu.</p>
         <p className="font-sans text-xs tracking-[0.2em] uppercase text-washi/50 mt-10">
           Takemusu Aiki Association Inc. &middot;{" "}
