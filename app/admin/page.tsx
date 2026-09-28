@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { getAdminPassword, setAdminPassword } from "@/lib/adminSession";
 
 interface Registration {
   id: number;
@@ -26,6 +27,7 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [storedPassword, setStoredPassword] = useState("");
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
 
   const fetchRegistrations = useCallback(async (pw: string) => {
     setLoading(true);
@@ -40,13 +42,22 @@ export default function AdminPage() {
       setRegistrations(data.registrations);
       setAuthenticated(true);
       setStoredPassword(pw);
+      setAdminPassword(pw);
     } catch (err) {
+      if (err instanceof Error && err.message === "Invalid password") setAdminPassword("");
       setError(err instanceof Error ? err.message : "Error");
       setAuthenticated(false);
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Reuse a sign-in from the Memories admin in this tab.
+  useEffect(() => {
+    const pw = getAdminPassword();
+    if (pw) fetchRegistrations(pw).finally(() => setCheckingSession(false));
+    else setCheckingSession(false);
+  }, [fetchRegistrations]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -110,6 +121,10 @@ export default function AdminPage() {
   const sunOnlyCount = registrations.filter((r) => r.registration_type === "sunday").length;
   const lunchSatCount = registrations.filter((r) => r.lunch_saturday).length;
   const lunchSunCount = registrations.filter((r) => r.lunch_sunday).length;
+
+  if (!authenticated && checkingSession) {
+    return <div className="min-h-screen bg-parchment" />;
+  }
 
   if (!authenticated) {
     return (

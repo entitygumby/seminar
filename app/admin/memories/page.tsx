@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getAdminPassword, setAdminPassword } from "@/lib/adminSession";
 import { ERAS, photoSrc, type Era, type Memory, type MemoryStatus } from "@/lib/memories-shared";
 import { LOW_RES_PX } from "../../memories/print/specs";
 
@@ -144,6 +145,7 @@ function MemoryCard({
 export default function MemoriesAdmin() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
+  const [checkingSession, setCheckingSession] = useState(true);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [storage, setStorage] = useState<{ database: string; photos: string; environment: string; durable: boolean } | null>(null);
   const [tab, setTab] = useState<MemoryStatus>("pending");
@@ -154,6 +156,7 @@ export default function MemoriesAdmin() {
     setError("");
     const res = await fetch("/api/memories/admin", { headers: { Authorization: `Bearer ${pw}` } });
     if (!res.ok) {
+      if (res.status === 401) setAdminPassword("");
       setError(res.status === 401 ? "Invalid password" : "Failed to load contributions");
       return;
     }
@@ -161,7 +164,15 @@ export default function MemoriesAdmin() {
     setMemories(data.memories);
     setStorage(data.storage);
     setToken(pw);
+    setAdminPassword(pw);
   }, []);
+
+  // Reuse a sign-in from the registrations admin in this tab.
+  useEffect(() => {
+    const pw = getAdminPassword();
+    if (pw) load(pw).finally(() => setCheckingSession(false));
+    else setCheckingSession(false);
+  }, [load]);
 
   async function save(id: number, patch: Partial<Memory>) {
     setBusy(id);
@@ -183,6 +194,10 @@ export default function MemoriesAdmin() {
     if (res.ok) setMemories((ms) => ms.filter((m) => m.id !== id));
     else setError("Delete failed");
     setBusy(null);
+  }
+
+  if (!token && checkingSession) {
+    return <main className="min-h-screen bg-parchment-dark" />;
   }
 
   if (!token) {
