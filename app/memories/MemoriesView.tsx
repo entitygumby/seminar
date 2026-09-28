@@ -18,7 +18,7 @@ function Header() {
         </a>
         <nav className="hidden sm:flex gap-8">
           {[
-            ["#album", "Album"],
+            ["#archive", "Archive"],
             ["#messages", "Messages"],
             ["#contribute", "Contribute"],
           ].map(([href, label]) => (
@@ -37,7 +37,7 @@ function Header() {
 }
 
 /* ──────────────────────── HERO ──────────────────────── */
-function Hero({ photoCount, messageCount }: { photoCount: number; messageCount: number }) {
+function Hero() {
   return (
     <section className="relative washi-texture overflow-hidden">
       <div
@@ -74,15 +74,12 @@ function Hero({ photoCount, messageCount }: { photoCount: number; messageCount: 
               Add your memory
             </a>
             <a
-              href="#album"
+              href="#archive"
               className="inline-block border border-sumi/25 text-sumi font-sans text-sm font-semibold tracking-widest uppercase px-8 py-4 hover:border-shu hover:text-shu transition-colors duration-300"
             >
-              View the album
+              From the archive
             </a>
           </div>
-          <p className="animate-fade-up animation-delay-500 mt-8 font-sans text-sm text-sumi-light">
-            {photoCount} photographs &middot; {messageCount} {messageCount === 1 ? "message" : "messages"} so far
-          </p>
         </div>
       </div>
     </section>
@@ -135,9 +132,13 @@ function Album({ photos }: { photos: AlbumPhoto[] }) {
   const current = open === null ? null : visible[open];
 
   return (
-    <section id="album" className="py-24 md:py-32 bg-washi">
+    <section id="archive" className="py-24 md:py-32 bg-washi">
       <div className="max-w-6xl mx-auto px-6">
-        <SectionHeading eyebrow="The album" title="Photographs" kanji="写真" />
+        <SectionHeading eyebrow="From the dojo archive" title="A few memories to begin" kanji="写真" />
+        <p className="font-sans text-base leading-relaxed text-sumi-light max-w-2xl -mt-4 mb-12">
+          A small selection from the club&apos;s archive. The full album is being gathered now &mdash; your
+          photographs will join these in the book presented to Sensei.
+        </p>
 
         {eras.length > 1 && (
           <div className="flex flex-wrap gap-2 mb-10">
@@ -308,11 +309,12 @@ function Footer() {
 }
 
 export function MemoriesView({ memories }: { memories: PublicMemory[] }) {
-  const photos = useMemo(() => collectPhotos(memories), [memories]);
+  // Only archive photos are shown publicly as examples; contributed photos go into the printed book.
+  const photos = useMemo(() => collectPhotos([]), []);
   return (
     <main className="bg-washi text-sumi">
       <Header />
-      <Hero photoCount={photos.length} messageCount={memories.filter((m) => m.message).length} />
+      <Hero />
       <Album photos={photos} />
       <Messages memories={memories} />
       <ContributeForm />
