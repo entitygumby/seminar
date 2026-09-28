@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { collectPhotos, ERAS, getMemories, toPublic, type PublicMemory } from "@/lib/memories";
+import { collectPhotos, ERAS, getMemories, photoSrc, toPublic, type PublicMemory } from "@/lib/memories";
 import { Seal } from "../Seal";
 import { attributionText } from "../attribution";
 import { PrintToolbar } from "./PrintToolbar";
@@ -150,7 +150,7 @@ export default async function PrintEdition({ searchParams }: { searchParams: Pro
                 <figure key={p.url} className="photo">
                   <div className="photo-frame">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={p.url} alt={p.caption} loading="eager" />
+                    <img src={photoSrc(p.url)} alt={p.caption} loading="eager" />
                   </div>
                   <figcaption>
                     {p.caption && <span className="caption">{p.caption}</span>}

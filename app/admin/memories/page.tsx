@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { ERAS, type Era, type Memory, type MemoryStatus } from "@/lib/memories-shared";
+import { ERAS, photoSrc, type Era, type Memory, type MemoryStatus } from "@/lib/memories-shared";
 import { LOW_RES_PX } from "../../memories/print/specs";
 
 const TABS: { key: MemoryStatus; label: string }[] = [
@@ -60,9 +60,9 @@ function MemoryCard({
               setDraft({ ...draft, photos: draft.photos.map((x, j) => (j === i ? { ...x, ...patch } : x)) });
             return (
               <div key={p.url} className="border border-slate-200 p-2 space-y-2">
-                <a href={p.url} target="_blank" rel="noopener noreferrer">
+                <a href={photoSrc(p.url)} target="_blank" rel="noopener noreferrer">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.url} alt={p.caption} className="w-full h-40 object-cover bg-slate-100" />
+                  <img src={photoSrc(p.url)} alt={p.caption} className="w-full h-40 object-cover bg-slate-100" />
                 </a>
                 <p className="font-sans text-[11px] text-warm-gray">
                   {p.width}×{p.height}px{Math.max(p.width, p.height) < LOW_RES_PX && " · may print soft"}

@@ -23,6 +23,24 @@ export interface Memory {
   created_at: string;
 }
 
+/** True for any Vercel Blob URL (public or private store). */
+export function isBlobUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith(".blob.vercel-storage.com");
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Photos in a private Blob store can't be loaded by browsers directly, so they are
+ * served through /api/memories/photo. Public-store URLs, site images and data URLs pass through.
+ */
+export function photoSrc(url: string): string {
+  if (!isBlobUrl(url) || new URL(url).hostname.includes(".public.")) return url;
+  return `/api/memories/photo?u=${encodeURIComponent(url)}`;
+}
+
 export type NewMemory = Omit<Memory, "id" | "status" | "created_at">;
 
 /** Public shape — never expose contributor emails. */

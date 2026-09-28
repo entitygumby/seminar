@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addMemory, ERAS, getMemories, storageStatus, toPublic, type Era, type MemoryPhoto } from "@/lib/memories";
+import { addMemory, ERAS, getMemories, hasBlob, isBlobUrl, storageStatus, toPublic, type Era, type MemoryPhoto } from "@/lib/memories";
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +16,8 @@ function str(v: unknown, max: number): string {
 }
 
 function isAllowedUrl(url: string): boolean {
-  if (url.startsWith("data:image/")) return !process.env.BLOB_READ_WRITE_TOKEN;
-  try {
-    return new URL(url).hostname.endsWith(".public.blob.vercel-storage.com");
-  } catch {
-    return false;
-  }
+  if (url.startsWith("data:image/")) return !hasBlob();
+  return isBlobUrl(url);
 }
 
 export async function POST(request: NextRequest) {

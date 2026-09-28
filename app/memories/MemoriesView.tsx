@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { collectPhotos, ERAS, type Era, type PublicMemory } from "@/lib/memories-shared";
+import { collectPhotos, ERAS, photoSrc, type Era, type PublicMemory } from "@/lib/memories-shared";
 import { Seal } from "./Seal";
 import { ContributeForm } from "./ContributeForm";
 import { attributionText } from "./attribution";
@@ -178,7 +178,7 @@ function Album({ photos }: { photos: AlbumPhoto[] }) {
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={p.url}
+                        src={photoSrc(p.url)}
                         alt={p.caption}
                         loading="lazy"
                         className="w-full h-auto block"
@@ -206,7 +206,7 @@ function Album({ photos }: { photos: AlbumPhoto[] }) {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={current.url}
+            src={photoSrc(current.url)}
             alt={current.caption}
             className="max-h-[80vh] max-w-full object-contain shadow-2xl"
             onClick={(e) => e.stopPropagation()}

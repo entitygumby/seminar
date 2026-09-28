@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { storageStatus } from "@/lib/memories";
+import { hasBlob, storageStatus } from "@/lib/memories";
 
 const MAX_BYTES = 4 * 1024 * 1024; // photos are resized in the browser before upload
 const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
@@ -26,17 +26,24 @@ export async function POST(request: NextRequest) {
   }
 
   // Without Blob storage configured (local dev), keep the image inline as a data URL.
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+  if (!hasBlob()) {
     const buf = Buffer.from(await file.arrayBuffer());
     return NextResponse.json({ url: `data:${file.type};base64,${buf.toString("base64")}` });
   }
 
   const { put } = await import("@vercel/blob");
   const ext = file.type.split("/")[1].replace("jpeg", "jpg");
-  const blob = await put(`memories/photo.${ext}`, file, {
-    access: "public",
-    addRandomSuffix: true,
-    contentType: file.type,
-  });
-  return NextResponse.json({ url: blob.url });
+  // Stores are created either private or public; try private first (photos then load via
+  // /api/memories/photo) and fall back to public for a public store.
+  let lastError: unknown;
+  for (const access of ["private", "public"] as const) {
+    try {
+      const blob = await put(`memories/photo.${ext}`, file, { access, addRandomSuffix: true, contentType: file.type });
+      return NextResponse.json({ url: blob.url });
+    } catch (err) {
+      lastError = err;
+    }
+  }
+  console.error("Blob upload failed:", lastError);
+  return NextResponse.json({ error: "Upload failed" }, { status: 502 });
 }

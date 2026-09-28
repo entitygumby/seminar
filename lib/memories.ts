@@ -10,6 +10,11 @@ function hasPostgres(): boolean {
   return !!(process.env.POSTGRES_URL || process.env.DATABASE_URL);
 }
 
+/** Blob stores connect either with a read-write token or (newer projects) a store id + OIDC. */
+export function hasBlob(): boolean {
+  return !!(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID);
+}
+
 /**
  * Where contributions and photos are being kept. On Vercel, the in-memory and inline
  * fallbacks would silently lose data, so routes refuse to accept uploads instead.
@@ -17,7 +22,7 @@ function hasPostgres(): boolean {
 export function storageStatus() {
   const onVercel = !!process.env.VERCEL;
   const database = hasPostgres() ? "postgres" : "memory";
-  const photos = process.env.BLOB_READ_WRITE_TOKEN ? "blob" : "inline";
+  const photos = hasBlob() ? "blob" : "inline";
   return {
     database,
     photos,

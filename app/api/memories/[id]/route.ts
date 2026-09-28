@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteMemory, isAdmin, updateMemory } from "@/lib/memories";
+import { deleteMemory, hasBlob, isAdmin, updateMemory } from "@/lib/memories";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!isAdmin(request)) {
@@ -29,7 +29,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   if (!removed) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const blobUrls = removed.photos.map((p) => p.url).filter((u) => u.startsWith("https://"));
-  if (blobUrls.length && process.env.BLOB_READ_WRITE_TOKEN) {
+  if (blobUrls.length && hasBlob()) {
     const { del } = await import("@vercel/blob");
     await del(blobUrls).catch((err) => console.error("Blob cleanup failed:", err));
   }
