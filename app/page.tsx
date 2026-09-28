@@ -148,7 +148,7 @@ function Hero() {
             </div>
             <div>
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray mb-1">Venue</p>
-              <p className="font-serif text-xl md:text-2xl font-medium">Pymble Town Hall, Sydney</p>
+              <p className="font-serif text-xl md:text-2xl font-medium">Ku-ring-gai Town Hall, Pymble</p>
             </div>
           </div>
 
