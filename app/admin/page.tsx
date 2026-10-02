@@ -19,6 +19,174 @@ interface Registration {
   created_at: string;
 }
 
+const TYPE_OPTIONS = [
+  { value: "both", label: "Both Days" },
+  { value: "saturday", label: "Saturday Only" },
+  { value: "sunday", label: "Sunday Only" },
+  { value: "dinner_only", label: "Dinner Only" },
+];
+
+const fieldLabel = "block font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-1";
+const fieldInput = "w-full border border-ink/20 bg-white font-sans text-sm px-3 py-2";
+
+function EditRegistrationModal({
+  registration,
+  password,
+  onSaved,
+  onClose,
+}: {
+  registration: Registration;
+  password: string;
+  onSaved: (updated: Registration) => void;
+  onClose: () => void;
+}) {
+  const [draft, setDraft] = useState(registration);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  const set = <K extends keyof Registration>(field: K, value: Registration[K]) =>
+    setDraft((prev) => ({ ...prev, [field]: value }));
+
+  const type = draft.registration_type;
+  const canLunchSat = type === "both" || type === "saturday";
+  const canLunchSun = type === "both" || type === "sunday";
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      const res = await fetch(`/api/registrations/${registration.id}?password=${encodeURIComponent(password)}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(draft),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Save failed. Please try again.");
+      onSaved(data.registration);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed. Please try again.");
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-20 bg-ink/40 flex items-center justify-center p-4" onClick={onClose}>
+      <form
+        onSubmit={handleSave}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 space-y-4"
+      >
+        <h2 className="font-serif text-2xl font-bold text-ink">Edit Registration</h2>
+
+        <div>
+          <label className={fieldLabel}>Name *</label>
+          <input required value={draft.name} onChange={(e) => set("name", e.target.value)} className={fieldInput} />
+        </div>
+        <div>
+          <label className={fieldLabel}>Email *</label>
+          <input required type="email" value={draft.email} onChange={(e) => set("email", e.target.value)} className={fieldInput} />
+        </div>
+        <div>
+          <label className={fieldLabel}>Phone *</label>
+          <input required type="tel" value={draft.phone} onChange={(e) => set("phone", e.target.value)} className={fieldInput} />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={fieldLabel}>Dojo</label>
+            <input value={draft.dojo} onChange={(e) => set("dojo", e.target.value)} className={fieldInput} />
+          </div>
+          <div>
+            <label className={fieldLabel}>Rank</label>
+            <input value={draft.rank} onChange={(e) => set("rank", e.target.value)} className={fieldInput} />
+          </div>
+        </div>
+        <div>
+          <label className={fieldLabel}>Registration Type</label>
+          <select
+            value={type}
+            onChange={(e) => {
+              const t = e.target.value;
+              setDraft((prev) => ({
+                ...prev,
+                registration_type: t,
+                attend_dinner: t === "dinner_only" ? true : prev.attend_dinner,
+                lunch_saturday: t === "both" || t === "saturday" ? prev.lunch_saturday : false,
+                lunch_sunday: t === "both" || t === "sunday" ? prev.lunch_sunday : false,
+              }));
+            }}
+            className={fieldInput}
+          >
+            {TYPE_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <label className="flex items-center gap-3 font-sans text-sm text-ink-light">
+            <input
+              type="checkbox"
+              checked={draft.attend_dinner}
+              disabled={type === "dinner_only"}
+              onChange={(e) => set("attend_dinner", e.target.checked)}
+              className="w-4 h-4 accent-crimson"
+            />
+            Anniversary Dinner
+          </label>
+          <label className={`flex items-center gap-3 font-sans text-sm ${canLunchSat ? "text-ink-light" : "text-ink-light/40"}`}>
+            <input
+              type="checkbox"
+              checked={draft.lunch_saturday}
+              disabled={!canLunchSat}
+              onChange={(e) => set("lunch_saturday", e.target.checked)}
+              className="w-4 h-4 accent-crimson"
+            />
+            Saturday Lunch
+          </label>
+          <label className={`flex items-center gap-3 font-sans text-sm ${canLunchSun ? "text-ink-light" : "text-ink-light/40"}`}>
+            <input
+              type="checkbox"
+              checked={draft.lunch_sunday}
+              disabled={!canLunchSun}
+              onChange={(e) => set("lunch_sunday", e.target.checked)}
+              className="w-4 h-4 accent-crimson"
+            />
+            Sunday Lunch
+          </label>
+        </div>
+        <div>
+          <label className={fieldLabel}>Dietary Requirements</label>
+          <textarea
+            rows={2}
+            value={draft.dietary_requirements}
+            onChange={(e) => set("dietary_requirements", e.target.value)}
+            className={fieldInput}
+          />
+        </div>
+
+        {error && <p className="font-sans text-sm text-crimson">{error}</p>}
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="font-sans text-xs font-semibold tracking-widest uppercase border border-ink/20 px-4 py-2 hover:border-ink/40 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="font-sans text-xs font-semibold tracking-widest uppercase bg-ink text-white px-4 py-2 hover:bg-ink-light transition-colors disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
@@ -28,6 +196,7 @@ export default function AdminPage() {
   const [storedPassword, setStoredPassword] = useState("");
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
+  const [editing, setEditing] = useState<Registration | null>(null);
 
   const fetchRegistrations = useCallback(async (pw: string) => {
     setLoading(true);
@@ -317,13 +486,22 @@ export default function AdminPage() {
                       </button>
                     </td>
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => handleDelete(reg)}
-                        disabled={actionLoading === reg.id}
-                        className="font-sans text-xs font-semibold tracking-wider uppercase px-3 py-1.5 border border-crimson/30 text-crimson hover:bg-crimson hover:text-white transition-all duration-200 disabled:opacity-40"
-                      >
-                        Delete
-                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setEditing(reg)}
+                          disabled={actionLoading === reg.id}
+                          className="font-sans text-xs font-semibold tracking-wider uppercase px-3 py-1.5 border border-ink/20 text-ink-light hover:border-ink/40 hover:text-ink transition-all duration-200 disabled:opacity-40"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(reg)}
+                          disabled={actionLoading === reg.id}
+                          className="font-sans text-xs font-semibold tracking-wider uppercase px-3 py-1.5 border border-crimson/30 text-crimson hover:bg-crimson hover:text-white transition-all duration-200 disabled:opacity-40"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -332,6 +510,18 @@ export default function AdminPage() {
           </div>
         )}
       </div>
+
+      {editing && (
+        <EditRegistrationModal
+          registration={editing}
+          password={storedPassword}
+          onClose={() => setEditing(null)}
+          onSaved={(updated) => {
+            setRegistrations((prev) => prev.map((r) => (r.id === updated.id ? updated : r)));
+            setEditing(null);
+          }}
+        />
+      )}
     </div>
   );
 }

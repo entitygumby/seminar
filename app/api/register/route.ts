@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
 
     const { name, email, phone, dojo, rank, registrationType, attendDinner, lunchSaturday, lunchSunday, dietaryRequirements } = body;
 
-    if (!name || !email) {
+    if (!name?.trim() || !email || !phone?.trim()) {
       return NextResponse.json(
-        { error: "Name and email are required" },
+        { error: "Name, email and phone number are required" },
         { status: 400 }
       );
     }
