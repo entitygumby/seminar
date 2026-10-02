@@ -88,8 +88,8 @@ function EditRegistrationModal({
           <input required type="email" value={draft.email} onChange={(e) => set("email", e.target.value)} className={fieldInput} />
         </div>
         <div>
-          <label className={fieldLabel}>Phone</label>
-          <input type="tel" value={draft.phone} onChange={(e) => set("phone", e.target.value)} className={fieldInput} />
+          <label className={fieldLabel}>Phone *</label>
+          <input required type="tel" value={draft.phone} onChange={(e) => set("phone", e.target.value)} className={fieldInput} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>

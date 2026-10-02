@@ -47,8 +47,9 @@ export async function PATCH(
   const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
   const name = str(body.name);
   const email = str(body.email).toLowerCase();
-  if (!name || !email) {
-    return NextResponse.json({ error: "Name and email are required" }, { status: 400 });
+  const phone = str(body.phone);
+  if (!name || !email || !phone) {
+    return NextResponse.json({ error: "Name, email and phone number are required" }, { status: 400 });
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
@@ -64,7 +65,7 @@ export async function PATCH(
   const updated = await updateRegistration(Number(id), {
     name,
     email,
-    phone: str(body.phone),
+    phone,
     dojo: str(body.dojo),
     rank: str(body.rank),
     registration_type: type,
