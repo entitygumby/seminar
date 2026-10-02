@@ -609,8 +609,8 @@ function RegistrationForm() {
             Registration Received
           </h2>
           <p className="font-sans text-lg text-ink-light mb-4">
-            Thank you for registering your interest. You will receive a confirmation
-            email with payment details shortly.
+            Thank you for registering. You will be added to the seminar WhatsApp
+            group, where we will share event updates.
           </p>
           <p className="font-sans text-sm text-warm-gray">
             If you have any questions, please contact{" "}
