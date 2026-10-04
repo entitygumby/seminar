@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { collectPhotos, ERAS, photoSrc, type Era, type PublicMemory } from "@/lib/memories-shared";
 import { Seal } from "./Seal";
 import { ContributeForm } from "./ContributeForm";
@@ -19,7 +19,7 @@ function Header() {
         <nav className="hidden sm:flex gap-8">
           {[
             ["#archive", "Archive"],
-            ["#messages", "Messages"],
+            ["#memories", "Memories"],
             ["#contribute", "Contribute"],
           ].map(([href, label]) => (
             <a
@@ -250,38 +250,172 @@ function Album({ photos }: { photos: AlbumPhoto[] }) {
 }
 
 /* ──────────────────────── MESSAGES ──────────────────────── */
-function Messages({ memories }: { memories: PublicMemory[] }) {
-  const withMessages = memories.filter((m) => m.message);
+function MemoryModal({ memory, onClose }: { memory: PublicMemory; onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
 
   return (
-    <section id="messages" className="py-24 md:py-32 washi-texture border-y border-sumi/10">
-      <div className="max-w-6xl mx-auto px-6">
-        <SectionHeading eyebrow="In their words" title="Messages to Sensei" kanji="言葉" />
-
-        {withMessages.length === 0 ? (
-          <p className="font-serif italic text-2xl text-sumi-light max-w-xl">
-            The first messages will appear here soon.{" "}
-            <a href="#contribute" className="text-shu underline underline-offset-4 decoration-1">
-              Be the first to write one.
-            </a>
-          </p>
-        ) : (
-          <div className="columns-1 md:columns-2 gap-8">
-            {withMessages.map((m) => (
-              <article key={m.id} className="break-inside-avoid mb-8 bg-white/70 border border-sumi/10 p-8 md:p-10 relative">
-                <span aria-hidden className="absolute top-3 left-6 font-serif text-7xl leading-none text-shu/25 select-none">
-                  &ldquo;
-                </span>
-                <p className="relative font-serif text-xl leading-relaxed text-sumi whitespace-pre-line">{m.message}</p>
-                <footer className="mt-6 pt-5 border-t border-sumi/10">
-                  <p className="font-sans text-sm font-semibold tracking-wide text-sumi">{m.name}</p>
-                  {attributionText(m) && <p className="font-sans text-xs text-sumi-light mt-1">{attributionText(m)}</p>}
-                </footer>
-              </article>
+    <div className="fixed inset-0 z-50 bg-sumi/90 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true">
+      <div
+        className="bg-washi max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-10 relative"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-5 font-sans text-xs tracking-[0.2em] uppercase text-sumi-light hover:text-shu"
+        >
+          Close
+        </button>
+        {memory.photos.length > 0 && (
+          <div className={`grid gap-4 mb-8 ${memory.photos.length > 1 ? "sm:grid-cols-2" : ""}`}>
+            {memory.photos.map((ph) => (
+              <figure key={ph.url}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photoSrc(ph.url)} alt={ph.caption} className="w-full h-auto bg-white p-2 shadow-sm" />
+                {ph.caption && <figcaption className="font-serif italic text-base text-sumi mt-2">{ph.caption}</figcaption>}
+              </figure>
             ))}
           </div>
         )}
+        {memory.message && (
+          <p className="font-serif text-xl leading-relaxed text-sumi whitespace-pre-line">{memory.message}</p>
+        )}
+        <p className="font-sans text-sm font-semibold tracking-wide text-sumi mt-6">{memory.name}</p>
+        {attributionText(memory) && <p className="font-sans text-xs text-sumi-light mt-1">{attributionText(memory)}</p>}
       </div>
+    </div>
+  );
+}
+
+/** Approved memories in a horizontal, swipeable row so the page stays short and the form stays close. */
+function Memories({ memories }: { memories: PublicMemory[] }) {
+  const items = memories.filter((m) => m.message || m.photos.length);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState<PublicMemory | null>(null);
+  const [edges, setEdges] = useState({ start: true, end: false });
+
+  const updateEdges = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    setEdges({ start: el.scrollLeft < 8, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 8 });
+  }, []);
+
+  useEffect(() => {
+    updateEdges();
+    window.addEventListener("resize", updateEdges);
+    return () => window.removeEventListener("resize", updateEdges);
+  }, [updateEdges]);
+
+  const scrollBy = (dir: 1 | -1) => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.85, behavior: "smooth" });
+  };
+
+  return (
+    <section id="memories" className="py-24 md:py-28 washi-texture border-y border-sumi/10">
+      <div className="max-w-6xl mx-auto px-6">
+        <SectionHeading eyebrow="In their words" title="Memories so far" kanji="言葉" />
+
+        {items.length === 0 ? (
+          <p className="font-serif italic text-2xl text-sumi-light max-w-xl">
+            The first memories will appear here soon.{" "}
+            <a href="#contribute" className="text-shu underline underline-offset-4 decoration-1">
+              Be the first to share one.
+            </a>
+          </p>
+        ) : (
+          <>
+            <div className="relative">
+              <div
+                ref={trackRef}
+                onScroll={updateEdges}
+                className="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-px-6 pb-4 -mx-6 px-6 [scrollbar-width:thin]"
+                role="region"
+                aria-label="Approved memories"
+                tabIndex={0}
+              >
+                {items.map((m) => {
+                  const cover = m.photos[0];
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => setOpen(m)}
+                      className="snap-start shrink-0 w-[82vw] sm:w-[320px] h-[440px] text-left bg-white/80 border border-sumi/10 flex flex-col overflow-hidden hover:border-shu/40 hover:-translate-y-0.5 transition-all duration-300"
+                    >
+                      {cover && (
+                        <div className="relative h-52 shrink-0 bg-washi-dark">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={photoSrc(cover.url)} alt={cover.caption} loading="lazy" className="w-full h-full object-cover" />
+                          {m.photos.length > 1 && (
+                            <span className="absolute bottom-2 right-2 bg-sumi/80 text-washi font-sans text-[11px] tracking-wide px-2 py-1">
+                              +{m.photos.length - 1} {m.photos.length === 2 ? "photo" : "photos"}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                      <div className="flex-1 min-h-0 p-6 flex flex-col">
+                        {m.message ? (
+                          <p className={`font-serif text-lg leading-relaxed text-sumi ${cover ? "line-clamp-3" : "line-clamp-[10]"}`}>
+                            &ldquo;{m.message}&rdquo;
+                          </p>
+                        ) : (
+                          cover?.caption && <p className="font-serif italic text-lg text-sumi line-clamp-3">{cover.caption}</p>
+                        )}
+                        <div className="mt-auto pt-4 border-t border-sumi/10">
+                          <p className="font-sans text-sm font-semibold tracking-wide text-sumi truncate">{m.name}</p>
+                          {attributionText(m) && <p className="font-sans text-xs text-sumi-light mt-0.5 truncate">{attributionText(m)}</p>}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {!edges.end && (
+                <div aria-hidden className="pointer-events-none absolute -right-6 top-0 bottom-4 w-16 bg-gradient-to-l from-washi to-transparent" />
+              )}
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex gap-2">
+                {([
+                  [-1, "M15.75 19.5L8.25 12l7.5-7.5", "Previous", edges.start],
+                  [1, "M8.25 4.5l7.5 7.5-7.5 7.5", "Next", edges.end],
+                ] as const).map(([dir, d, label, disabled]) => (
+                  <button
+                    key={label}
+                    onClick={() => scrollBy(dir)}
+                    disabled={disabled}
+                    aria-label={`${label} memories`}
+                    className="w-11 h-11 rounded-full border border-sumi/20 text-sumi flex items-center justify-center hover:border-shu hover:text-shu transition-colors disabled:opacity-30 disabled:hover:border-sumi/20 disabled:hover:text-sumi"
+                  >
+                    <svg fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d={d} />
+                    </svg>
+                  </button>
+                ))}
+                <span className="self-center font-sans text-xs text-sumi-light ml-2">
+                  {items.length} {items.length === 1 ? "memory" : "memories"} &middot; tap one to read in full
+                </span>
+              </div>
+              <a
+                href="#contribute"
+                className="inline-block bg-sumi text-washi font-sans text-sm font-semibold tracking-widest uppercase px-8 py-4 hover:bg-shu transition-colors duration-300"
+              >
+                Add your memory
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+      {open && <MemoryModal memory={open} onClose={() => setOpen(null)} />}
     </section>
   );
 }
@@ -316,7 +450,7 @@ export function MemoriesView({ memories }: { memories: PublicMemory[] }) {
       <Header />
       <Hero />
       <Album photos={photos} />
-      <Messages memories={memories} />
+      <Memories memories={memories} />
       <ContributeForm />
       <Footer />
     </main>
