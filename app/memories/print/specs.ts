@@ -3,7 +3,7 @@
  * (mixam.com.au/support/filesetup, /support/hardcoversetup) — re-check against the
  * template Mixam shows on the order page before uploading.
  */
-export const TRIM = { width: 210, height: 297 }; // A4 portrait, mm
+export const TRIM = { width: 297, height: 210 }; // A4 landscape, mm
 
 export const MIXAM = {
   interiorBleed: 3, // every inner page
@@ -25,5 +25,8 @@ export function coverSpread(binding: Binding, spine: number) {
   };
 }
 
+/** Longest edge a photo reaches on the page: a 3:2 print at the 136 mm single-photo height (see print.css). */
+export const LONGEST_PHOTO_MM = 205;
+
 /** Longest photo edge (px) below which a photo prints under ~250 dpi at its largest size on the page. */
-export const LOW_RES_PX = 1700;
+export const LOW_RES_PX = Math.round((LONGEST_PHOTO_MM / 25.4) * 250); // ≈ 2,018 px

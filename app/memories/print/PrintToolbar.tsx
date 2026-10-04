@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MIXAM, TRIM } from "./specs";
 
 async function imagesLoaded() {
   await Promise.all(
@@ -48,7 +49,9 @@ export function PrintToolbar({
         <p className="font-serif text-lg flex-1">
           {pageCount} pages
           <span className="text-washi/50">
-            {mixam ? " · 216 × 303 mm (A4 + 3 mm bleed)" : " · A4"}
+            {mixam
+              ? ` · ${TRIM.width + MIXAM.interiorBleed * 2} × ${TRIM.height + MIXAM.interiorBleed * 2} mm (A4 landscape + 3 mm bleed)`
+              : " · A4 landscape"}
             {blanks > 0 && ` · incl. ${blanks} blank to reach a multiple of 4`}
           </span>
         </p>
@@ -71,12 +74,13 @@ export function PrintToolbar({
         <div className="max-w-6xl mx-auto px-6 pb-5 font-sans text-sm text-washi/80 leading-relaxed space-y-2">
           <p>
             Use <strong>Chrome or Edge</strong>. In the print dialog choose <strong>Save as PDF</strong>, leave
-            paper size as set by the page, margins <strong>None</strong>, scale <strong>100</strong>, and tick{" "}
+            paper size as set by the page (A4 landscape), margins <strong>None</strong>, scale <strong>100</strong>, and tick{" "}
             <strong>Background graphics</strong>.
           </p>
           {mixam && (
             <p>
-              Upload this as the interior and the Mixam cover as the cover. Mixam converts the colours to CMYK
+              Order the book as <strong>A4 landscape</strong> so Mixam&rsquo;s template matches these pages. Upload
+              this as the interior and the Mixam cover as the cover. Mixam converts the colours to CMYK
               on upload, so reds and the paper tone may shift slightly — check their online proof before paying.
             </p>
           )}

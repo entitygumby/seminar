@@ -1,6 +1,6 @@
-/* Print edition: fixed A4 sheets, identical on screen and on paper.
-   --bleed is 0 for the home proof and 3mm for the Mixam interior; the @page size
-   is set inline by each page to match. */
+/* Print edition: fixed A4 landscape sheets, identical on screen and on paper.
+   --bleed is 0 for the home proof and 3mm for the Mixam interior; --trim-w/--trim-h
+   and the @page size are set inline from TRIM in specs.ts. */
 
 /* Static (non-variable) fonts for the print pages. Chrome can only embed static fonts
    in a PDF; variable web fonts come out as Type 3 outlines, which print preflight flags. */
@@ -71,6 +71,8 @@
   --sumi-light: #6b6259;
   --shu: #a93226;
   --bleed: 0mm;
+  --trim-w: 297mm;
+  --trim-h: 210mm;
   background: #d9d4cb;
   padding: 88px 0 48px;
   color: var(--sumi);
@@ -80,8 +82,8 @@
 
 .sheet {
   position: relative;
-  width: calc(210mm + 2 * var(--bleed));
-  height: calc(297mm + 2 * var(--bleed));
+  width: calc(var(--trim-w) + 2 * var(--bleed));
+  height: calc(var(--trim-h) + 2 * var(--bleed));
   margin: 0 auto 24px;
   overflow: hidden;
   background: var(--paper);
@@ -96,13 +98,14 @@
   page-break-after: auto;
 }
 
+/* Content box: 257 × 176 mm on the trimmed page */
 .interior {
-  padding: calc(22mm + var(--bleed)) calc(20mm + var(--bleed)) calc(24mm + var(--bleed));
+  padding: calc(16mm + var(--bleed)) calc(20mm + var(--bleed)) calc(18mm + var(--bleed));
 }
 
 .folio {
   position: absolute;
-  bottom: calc(11mm + var(--bleed));
+  bottom: calc(7mm + var(--bleed));
   left: 0;
   right: 0;
   text-align: center;
@@ -118,13 +121,13 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 30mm;
+  padding: 20mm;
   border: 8mm solid var(--washi);
   outline: 0.4mm solid rgba(35, 31, 27, 0.25);
   outline-offset: -14mm;
 }
 .cover-dates {
-  margin-top: 16mm;
+  margin-top: 10mm;
   font-family: var(--font-sans);
   font-size: 10pt;
   letter-spacing: 0.4em;
@@ -137,14 +140,14 @@
   font-weight: 300;
   font-size: 64pt;
   line-height: 1;
-  margin-top: 8mm;
+  margin-top: 6mm;
 }
 .cover-sub {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 18pt;
   color: var(--sumi-light);
-  margin-top: 10mm;
+  margin-top: 8mm;
 }
 .cover-name {
   font-family: var(--font-serif);
@@ -156,7 +159,7 @@
   width: 18mm;
   height: 0.8mm;
   background: var(--shu);
-  margin: 14mm auto;
+  margin: 10mm auto;
   border-radius: 1mm;
 }
 .cover-from {
@@ -172,17 +175,18 @@
 .dedication {
   align-items: center;
   justify-content: center;
-  padding: 0 calc(32mm + var(--bleed));
+  padding: 0 calc(48mm + var(--bleed));
 }
 .dedication-inner {
   text-align: center;
+  max-width: 190mm;
 }
 .kanji-large {
   font-family: var(--font-jp), "Noto Serif JP", serif;
   font-size: 34pt;
   color: var(--shu);
   letter-spacing: 0.2em;
-  margin-bottom: 14mm;
+  margin-bottom: 10mm;
 }
 .dedication-text {
   font-family: var(--font-serif);
@@ -191,7 +195,7 @@
   margin-bottom: 7mm;
 }
 .dedication-sign {
-  margin-top: 14mm;
+  margin-top: 10mm;
   font-family: var(--font-sans);
   font-size: 8.5pt;
   letter-spacing: 0.15em;
@@ -232,12 +236,9 @@
   display: grid;
   gap: 9mm;
 }
-.photos-stack .photo-grid {
-  grid-template-rows: 1fr 1fr;
-}
 .photos-pair .photo-grid {
   grid-template-columns: 1fr 1fr;
-  gap: 7mm;
+  gap: 9mm;
 }
 .photos-single .photo-grid {
   grid-template-rows: 1fr;
@@ -258,14 +259,14 @@
   padding: 2.2mm;
   box-shadow: 0 0 0 0.25mm rgba(35, 31, 27, 0.12);
 }
-.photos-stack .photo-frame img {
-  max-height: 100mm;
-}
-.photos-pair .photo-frame img {
-  max-height: 175mm;
-}
+/* 176 mm content height, less the era label (~10 mm), caption (~20 mm) and mat;
+   the first page also carries the chapter title (~16 mm). LONGEST_PHOTO_MM in specs.ts follows these. */
+.photos-pair .photo-frame img,
 .photos-single .photo-frame img {
-  max-height: 190mm;
+  max-height: 136mm;
+}
+.with-title .photo-frame img {
+  max-height: 120mm;
 }
 .photo figcaption {
   text-align: center;
@@ -290,9 +291,16 @@
 
 /* Messages */
 .messages {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 12mm;
+  align-items: start;
+}
+.message-column {
   display: flex;
   flex-direction: column;
-  gap: 9mm;
+  gap: 8mm;
+  min-width: 0;
 }
 .message {
   padding-left: 6mm;
@@ -320,7 +328,7 @@
 
 /* Contributors */
 .contributors {
-  columns: 3;
+  columns: 4;
   column-gap: 8mm;
   list-style: none;
   padding: 0;

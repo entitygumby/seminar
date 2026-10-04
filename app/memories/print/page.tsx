@@ -17,58 +17,65 @@ export const metadata: Metadata = {
 type Photo = ReturnType<typeof collectPhotos>[number];
 
 type Sheet =
-  | { kind: "photos"; era: string; showEra: boolean; layout: "stack" | "pair" | "single"; photos: Photo[] }
-  | { kind: "messages"; first: boolean; messages: PublicMemory[] };
+  | { kind: "photos"; era: string; showEra: boolean; layout: "pair" | "single"; photos: Photo[] }
+  | { kind: "messages"; first: boolean; columns: PublicMemory[][] };
 
 const isPortrait = (p: Photo) => p.height > p.width * 1.05;
 
-/** Two landscape photos stacked, or two portraits side by side, per page. */
+/** One landscape photo per page, or two portraits side by side. */
 function paginatePhotos(photos: Photo[]): Sheet[] {
   const sheets: Sheet[] = [];
   for (const era of ERAS) {
     const inEra = photos.filter((p) => p.era === era);
     let first = true;
-    const push = (layout: "stack" | "pair" | "single", group: Photo[]) => {
+    const push = (layout: "pair" | "single", group: Photo[]) => {
       sheets.push({ kind: "photos", era, showEra: first, layout, photos: group });
       first = false;
     };
-    let wide: Photo[] = [];
     let tall: Photo[] = [];
     for (const p of inEra) {
       if (isPortrait(p)) {
         tall.push(p);
         if (tall.length === 2) (push("pair", tall), (tall = []));
       } else {
-        wide.push(p);
-        if (wide.length === 2) (push("stack", wide), (wide = []));
+        push("single", [p]);
       }
     }
-    // Leftovers: one landscape + one portrait share a page rather than taking one each.
-    const rest = [...wide, ...tall];
-    if (rest.length) push(rest.length === 2 ? "stack" : "single", rest);
+    if (tall.length) push("single", tall);
   }
   return sheets;
 }
 
-/** Rough character budget per A4 page at 13pt so no message is split across pages. */
+/**
+ * Fills two 122 mm columns per A4 landscape page, so no message is split across columns
+ * or pages. A column holds ~24 lines of ~60 characters at 13pt (fewer under the chapter
+ * title); the budgets sit a little under that. Messages are capped at 1,200 characters,
+ * so even the longest fits a column on its own.
+ */
 function paginateMessages(memories: PublicMemory[]): Sheet[] {
-  const BUDGET = 2400;
+  const COLUMN = 1400;
+  const FIRST_COLUMN = 1150;
   const OVERHEAD = 260;
   const sheets: Sheet[] = [];
-  let current: PublicMemory[] = [];
+  let columns: PublicMemory[][] = [[]];
   let used = 0;
+  const flush = () => {
+    sheets.push({ kind: "messages", first: sheets.length === 0, columns });
+    columns = [[]];
+  };
   for (const m of memories.filter((m) => m.message)) {
     const cost = m.message.length + OVERHEAD + (m.message.match(/\n/g)?.length ?? 0) * 60;
-    const budget = sheets.length === 0 ? BUDGET - 500 : BUDGET;
-    if (current.length && used + cost > budget) {
-      sheets.push({ kind: "messages", first: sheets.length === 0, messages: current });
-      current = [];
+    const budget = sheets.length === 0 ? FIRST_COLUMN : COLUMN;
+    const column = columns[columns.length - 1];
+    if (column.length && used + cost > budget) {
+      if (columns.length === 2) flush();
+      else columns.push([]);
       used = 0;
     }
-    current.push(m);
+    columns[columns.length - 1].push(m);
     used += cost;
   }
-  if (current.length) sheets.push({ kind: "messages", first: sheets.length === 0, messages: current });
+  if (columns[0].length) flush();
   return sheets;
 }
 
@@ -77,7 +84,7 @@ function PageNumber({ n }: { n: number }) {
 }
 
 export default async function PrintEdition({ searchParams }: { searchParams: Promise<{ edition?: string }> }) {
-  // "proof": A4 with cover, for home printing. "mixam": interior pages only, 3mm bleed,
+  // "proof": A4 landscape with cover, for home printing. "mixam": interior pages only, 3mm bleed,
   // padded to a multiple of 4 — the cover is a separate spread at /memories/print/cover.
   const mixam = (await searchParams).edition === "mixam";
   const bleed = mixam ? MIXAM.interiorBleed : 0;
@@ -97,7 +104,14 @@ export default async function PrintEdition({ searchParams }: { searchParams: Pro
   let page = mixam ? 1 : 2;
 
   return (
-    <div className="print-root" style={{ ["--bleed" as string]: `${bleed}mm` }}>
+    <div
+      className="print-root"
+      style={{
+        ["--bleed" as string]: `${bleed}mm`,
+        ["--trim-w" as string]: `${TRIM.width}mm`,
+        ["--trim-h" as string]: `${TRIM.height}mm`,
+      }}
+    >
       <style>{`@page { size: ${TRIM.width + bleed * 2}mm ${TRIM.height + bleed * 2}mm; margin: 0; }`}</style>
       <PrintToolbar
         edition={mixam ? "mixam" : "proof"}
@@ -140,7 +154,7 @@ export default async function PrintEdition({ searchParams }: { searchParams: Pro
         if (s.kind !== "photos") return null;
         page++;
         return (
-          <section key={`p${i}`} className={`sheet interior photos-${s.layout}`}>
+          <section key={`p${i}`} className={`sheet interior photos-${s.layout}${i === 0 ? " with-title" : ""}`}>
             {i === 0 && <h2 className="chapter-title">Photographs</h2>}
             {s.showEra && (
               <p className="era-label">{s.era === "Undated" ? "From the archive" : s.era}</p>
@@ -177,12 +191,16 @@ export default async function PrintEdition({ searchParams }: { searchParams: Pro
               </>
             )}
             <div className="messages">
-              {s.messages.map((m) => (
-                <article key={m.id} className="message">
-                  <p className="message-body">{m.message}</p>
-                  <p className="message-name">{m.name}</p>
-                  {attributionText(m) && <p className="message-meta">{attributionText(m)}</p>}
-                </article>
+              {s.columns.map((column, c) => (
+                <div key={c} className="message-column">
+                  {column.map((m) => (
+                    <article key={m.id} className="message">
+                      <p className="message-body">{m.message}</p>
+                      <p className="message-name">{m.name}</p>
+                      {attributionText(m) && <p className="message-meta">{attributionText(m)}</p>}
+                    </article>
+                  ))}
+                </div>
               ))}
             </div>
             <PageNumber n={page} />
