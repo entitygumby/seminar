@@ -187,6 +187,62 @@ function EditRegistrationModal({
   );
 }
 
+type SortKey =
+  | "name" | "email" | "phone" | "dojo" | "rank" | "registration_type"
+  | "attend_dinner" | "lunch_saturday" | "lunch_sunday" | "dietary_requirements"
+  | "created_at" | "paid";
+type SortDir = "asc" | "desc";
+
+// Yes/No and date columns start with Yes / newest first; text columns start A–Z.
+const DESC_FIRST: SortKey[] = ["attend_dinner", "lunch_saturday", "lunch_sunday", "created_at", "paid"];
+const TYPE_ORDER = ["both", "saturday", "sunday", "dinner_only"];
+
+function sortRegistrations(list: Registration[], key: SortKey, dir: SortDir): Registration[] {
+  const sign = dir === "asc" ? 1 : -1;
+  return [...list].sort((a, b) => {
+    const av = a[key];
+    const bv = b[key];
+    if (typeof av === "boolean" || typeof bv === "boolean") return sign * (Number(!!av) - Number(!!bv));
+    if (key === "registration_type") return sign * (TYPE_ORDER.indexOf(String(av)) - TYPE_ORDER.indexOf(String(bv)));
+    if (key === "created_at") return sign * (new Date(String(av)).getTime() - new Date(String(bv)).getTime());
+    const as = String(av ?? "").trim();
+    const bs = String(bv ?? "").trim();
+    // Blanks always go to the bottom, whichever direction.
+    if (!as || !bs) return Number(!as) - Number(!bs);
+    return sign * as.localeCompare(bs, "en-AU", { sensitivity: "base", numeric: true });
+  });
+}
+
+function SortHeader({
+  label,
+  column,
+  sort,
+  onSort,
+}: {
+  label: string;
+  column: SortKey;
+  sort: { key: SortKey; dir: SortDir };
+  onSort: (key: SortKey) => void;
+}) {
+  const active = sort.key === column;
+  return (
+    <th
+      aria-sort={active ? (sort.dir === "asc" ? "ascending" : "descending") : "none"}
+      className="text-left font-sans text-xs tracking-[0.15em] uppercase font-semibold px-4 py-3"
+    >
+      <button
+        onClick={() => onSort(column)}
+        className={`inline-flex items-center gap-1 uppercase tracking-[0.15em] whitespace-nowrap hover:text-ink transition-colors ${
+          active ? "text-ink" : "text-warm-gray"
+        }`}
+      >
+        {label}
+        <span className={active ? "" : "opacity-30"}>{active && sort.dir === "asc" ? "▲" : "▼"}</span>
+      </button>
+    </th>
+  );
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
@@ -197,6 +253,14 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [checkingSession, setCheckingSession] = useState(true);
   const [editing, setEditing] = useState<Registration | null>(null);
+  const [sort, setSort] = useState<{ key: SortKey; dir: SortDir }>({ key: "created_at", dir: "desc" });
+
+  const handleSort = (key: SortKey) =>
+    setSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: DESC_FIRST.includes(key) ? "desc" : "asc" }
+    );
 
   const fetchRegistrations = useCallback(async (pw: string) => {
     setLoading(true);
@@ -405,23 +469,23 @@ export default function AdminPage() {
               <thead>
                 <tr className="border-b border-ink/10 bg-parchment-dark">
                   <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">#</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Name</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Email</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Phone</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Dojo</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Rank</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Type</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Dinner</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Sat Lunch</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Sun Lunch</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Diet</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Date</th>
-                  <th className="text-left font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold px-4 py-3">Paid</th>
+                  <SortHeader label="Name" column="name" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Email" column="email" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Phone" column="phone" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Dojo" column="dojo" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Rank" column="rank" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Type" column="registration_type" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Dinner" column="attend_dinner" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Sat Lunch" column="lunch_saturday" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Sun Lunch" column="lunch_sunday" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Diet" column="dietary_requirements" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Date" column="created_at" sort={sort} onSort={handleSort} />
+                  <SortHeader label="Paid" column="paid" sort={sort} onSort={handleSort} />
                   <th className="px-4 py-3"></th>
                 </tr>
               </thead>
               <tbody>
-                {registrations.map((reg, i) => (
+                {sortRegistrations(registrations, sort.key, sort.dir).map((reg, i) => (
                   <tr
                     key={reg.id}
                     className={`border-b border-ink/5 transition-colors ${
