@@ -148,7 +148,7 @@ function Hero() {
             </div>
             <div>
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray mb-1">Venue</p>
-              <p className="font-serif text-xl md:text-2xl font-medium">Pymble Town Hall, Sydney</p>
+              <p className="font-serif text-xl md:text-2xl font-medium">Ku-ring-gai Town Hall, Pymble</p>
             </div>
           </div>
 
@@ -341,7 +341,7 @@ const day1 = [
   { time: "13:30 – 15:00", title: "Variety of Throwing Techniques", desc: "Shiho-nage, Kote-gaeshi, Irimi-nage, Kokyu-nage, Koshi-nage, Tenchi-nage, Juji-garami" },
   { time: "15:00 – 15:15", title: "Break", desc: "" },
   { time: "15:15 – 16:15", title: "Ushiro-waza & Practical Application", desc: "Variety of Ushiro-waza & practical application of Aikido (Ooyo waza)" },
-  { time: "18:30", title: "50th Anniversary Dinner", desc: "Dinner at a local restaurant" },
+  { time: "18:30", title: "50th Anniversary Dinner", desc: "Dinner at Zilver, Chatswood" },
 ];
 
 const day2 = [
@@ -426,7 +426,7 @@ function Schedule() {
 /* ──────────────────────── PRICING ──────────────────────── */
 function Pricing() {
   return (
-    <section className="py-24 md:py-32 relative overflow-hidden">
+    <section id="fees" className="py-24 md:py-32 relative overflow-hidden">
       <div className="max-w-6xl mx-auto px-6">
         <Reveal>
           <p className="font-sans text-xs tracking-[0.3em] uppercase text-crimson font-semibold mb-4">
@@ -460,8 +460,8 @@ function Pricing() {
           <Reveal delay={400}>
             <div className="border-2 border-ink/10 p-8 hover:border-crimson/30 transition-colors duration-500 bg-white">
               <p className="font-sans text-xs tracking-[0.2em] uppercase text-warm-gray font-semibold mb-4">Anniversary Dinner</p>
-              <p className="font-serif text-5xl font-bold text-crimson mb-2">TBC</p>
-              <p className="font-sans text-sm text-ink-light">Saturday dinner party with Takayasu Sensei at a local restaurant (optional)</p>
+              <p className="font-serif text-5xl font-bold text-crimson mb-2">$75</p>
+              <p className="font-sans text-sm text-ink-light">Saturday dinner party with Takayasu Sensei at Zilver, Chatswood (optional)</p>
             </div>
           </Reveal>
         </div>
@@ -609,8 +609,13 @@ function RegistrationForm() {
             Registration Received
           </h2>
           <p className="font-sans text-lg text-ink-light mb-4">
-            Thank you for registering your interest. You will receive a confirmation
-            email with payment details shortly.
+            Thank you for registering. You will be added to the seminar WhatsApp
+            group, where we will share event updates.
+          </p>
+          <p className="font-sans text-base text-ink-light mb-4">
+            Please pay using the bank details in the{" "}
+            <a href="#fees" className="text-crimson hover:underline">Seminar Fees</a>{" "}
+            section, with your name as the reference.
           </p>
           <p className="font-sans text-sm text-warm-gray">
             If you have any questions, please contact{" "}
@@ -646,8 +651,9 @@ function RegistrationForm() {
             </Reveal>
             <Reveal delay={200}>
               <p className="font-sans text-base text-ink-light mb-8 leading-relaxed">
-                Numbers are limited to 50 attendees. Register your interest below and
-                we will confirm your place and provide payment details.
+                Numbers are limited to 50 attendees. Register below and you will be
+                added to the seminar WhatsApp group. Payment details are in the{" "}
+                <a href="#fees" className="text-crimson hover:underline">Seminar Fees</a> section.
               </p>
             </Reveal>
             <Reveal delay={300}>
@@ -658,7 +664,7 @@ function RegistrationForm() {
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
-                  <p className="font-sans text-sm text-ink-light">Anniversary dinner: <span className="text-ink font-semibold">TBC</span> (optional add-on or dinner only)</p>
+                  <p className="font-sans text-sm text-ink-light">Anniversary dinner at Zilver, Chatswood: <span className="text-ink font-semibold">$75</span> (optional add-on or dinner only)</p>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-1 rounded-full bg-crimson mt-2 shrink-0" />
@@ -700,10 +706,11 @@ function RegistrationForm() {
 
               <div>
                 <label className="block font-sans text-xs tracking-[0.15em] uppercase text-warm-gray font-semibold mb-2">
-                  Phone Number
+                  Phone Number *
                 </label>
                 <input
                   type="tel"
+                  required
                   value={form.phone}
                   onChange={(e) => update("phone", e.target.value)}
                   className="w-full bg-white border border-ink/10 text-ink font-sans text-sm px-4 py-3 placeholder-warm-gray/60"
@@ -747,7 +754,7 @@ function RegistrationForm() {
                     { value: "both", label: "Both Days", price: "$150" },
                     { value: "saturday", label: "Saturday Only", price: "$80" },
                     { value: "sunday", label: "Sunday Only", price: "$80" },
-                    { value: "dinner_only", label: "Dinner Only", price: "TBC" },
+                    { value: "dinner_only", label: "Dinner Only", price: "$75" },
                   ] as const).map((opt) => (
                     <button
                       key={opt.value}
@@ -788,7 +795,7 @@ function RegistrationForm() {
                   className="w-4 h-4 accent-crimson disabled:opacity-50"
                 />
                 <label htmlFor="dinner" className={`font-sans text-sm cursor-pointer ${form.registrationType === "dinner_only" ? "text-ink-light/50" : "text-ink-light"}`}>
-                  Add Anniversary Dinner — Saturday evening (price TBC)
+                  Add Anniversary Dinner — Saturday evening at Zilver, Chatswood — <span className="text-ink font-semibold">$75</span>
                 </label>
               </div>
 

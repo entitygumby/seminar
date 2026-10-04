@@ -66,6 +66,9 @@ function Hero() {
             trained with him, to be presented to Sensei as a printed keepsake at the anniversary
             seminar.
           </p>
+          <p className="animate-fade-up animation-delay-300 mt-6 font-sans text-sm font-semibold tracking-wide text-shu">
+            Contributions close Saturday 10 October 2026.
+          </p>
           <div className="animate-fade-up animation-delay-400 mt-10 flex flex-wrap gap-4">
             <a
               href="#contribute"

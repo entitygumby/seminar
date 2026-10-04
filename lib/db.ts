@@ -149,6 +149,40 @@ export async function updatePaidStatus(id: number, paid: boolean): Promise<Regis
   }
 }
 
+export type RegistrationUpdate = Omit<Registration, "id" | "paid" | "created_at">;
+
+export async function updateRegistration(id: number, reg: RegistrationUpdate): Promise<Registration | null> {
+  if (!hasPostgres()) {
+    const entry = memoryStore.find((r) => r.id === id);
+    if (!entry) return null;
+    Object.assign(entry, reg);
+    return entry;
+  }
+  try {
+    await initDB();
+    const sql = await getSQL();
+    const result = await sql`
+      UPDATE registrations SET
+        name = ${reg.name},
+        email = ${reg.email},
+        phone = ${reg.phone},
+        dojo = ${reg.dojo},
+        rank = ${reg.rank},
+        registration_type = ${reg.registration_type},
+        attend_dinner = ${reg.attend_dinner},
+        lunch_saturday = ${reg.lunch_saturday},
+        lunch_sunday = ${reg.lunch_sunday},
+        dietary_requirements = ${reg.dietary_requirements}
+      WHERE id = ${id}
+      RETURNING *
+    `;
+    return (result.rows[0] as Registration) ?? null;
+  } catch (error) {
+    console.error("Postgres update registration failed:", error);
+    return null;
+  }
+}
+
 export async function getRegistrationCount(): Promise<number> {
   if (!hasPostgres()) {
     return memoryStore.length;

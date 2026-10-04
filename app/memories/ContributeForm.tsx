@@ -136,7 +136,8 @@ export function ContributeForm() {
         <p className="font-sans text-base leading-relaxed text-sumi-light mb-12">
           Whether you trained with Sensei for one seminar or forty years, we&apos;d love to include you.
           Share a photograph, a few words of thanks, or both. Each contribution is reviewed by the
-          committee before it appears here and in the printed book presented to Sensei.
+          committee before it appears here and in the printed book presented to Sensei.{" "}
+          <span className="font-semibold text-sumi">Contributions close Saturday 10 October 2026.</span>
         </p>
 
         {done ? (
