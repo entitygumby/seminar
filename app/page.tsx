@@ -348,9 +348,9 @@ const day2 = [
   { time: "08:30 – 09:00", title: "Registration", desc: "" },
   { time: "09:00 – 10:30", title: "Ken Techniques", desc: "Kihon ken suburi (100 cuts), 7 Ken awase, Kimusubi-no-tachi, 5 Kumi-tachi & variations" },
   { time: "10:30 – 10:45", title: "Break", desc: "" },
-  { time: "10:45 – 12:15", title: "Jo Techniques", desc: "31 Jo kata, 13 Jo kata, 7 Jo awase, 10 Kumi-jo, 31 Jo awase" },
+  { time: "10:45 – 12:15", title: "Jo Techniques", desc: "31 Jo kata, 13 Jo kata, 7 Jo awase, 10 Kumi-jo" },
   { time: "12:15 – 13:30", title: "Lunch", desc: "" },
-  { time: "13:30 – 15:00", title: "Demonstrations", desc: "Demonstration by Aikido instructors & related Japanese martial art instructors (kenjitsu, jujitsu)" },
+  { time: "13:30 – 15:00", title: "Jo Awase & Weapons Taking", desc: "31 Jo awase, Tanto-dori, Tachi-dori, Jo-dori" },
 ];
 
 function Schedule() {
